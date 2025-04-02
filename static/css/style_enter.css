@@ -1,0 +1,109 @@
+body {
+    background: url('../img/background.avif');
+    background-size: 100vw 100vh;
+    /*max-width: 100%; */
+    /* width: 100vw;
+    height: 100vh; */
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+/*.clearfix::after {
+    content: "";
+    display: block;
+    clear: both;
+}*/
+
+.authorization{
+    /* margin: auto; */
+    /* margin-left: auto;
+    margin-right: auto; */
+    /* margin-bottom: 50%;
+    margin-top: 50%; */
+    display: block;
+    box-sizing: border-box;
+    width: 388px;
+    height: 444px;
+    padding: 28px;
+    background-color: #151515;
+    border-radius: 20px;
+    /* grid-area: 1 / 1;
+    z-index: 1; */
+    
+}
+
+/* .background-img{
+    max-width: 100%;
+    max-height: 100%;  
+    width: 100vw;
+    height: 100vw;      
+    height: auto;
+    filter: brightness(50%);
+} */
+
+/* .div-with-bacground-img{
+    grid-area: 1 / 1;
+} */
+
+a{
+    text-decoration: none;
+}
+.button{
+    font-size: 20px;
+    width: 100%;
+}
+
+.login_form{
+    text-align: center;
+    
+}
+
+.create_accaunt{
+    display: block;
+    margin-top: 50px;
+
+}
+
+.logo{
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    margin-bottom: 30px;
+}
+
+.logo_name{
+    display: inline-block;
+    margin-left: 20px;
+}
+
+.grid{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.info{
+    display: flex;
+    justify-content: space-between;
+    width: 80vw;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.info li{
+    display: inline-block;
+    direction: none;
+    
+
+    /* transform: translate(-50%); */
+    /* white-space: break-spaces; */
+    /* white-space: nowrap */
+}
+
+body{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100vh;
+    padding: 0;
+    margin: 0;
+}

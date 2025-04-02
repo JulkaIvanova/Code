@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %} 
+                <div class="search-friends-div">
+                    <form style="width: 100%; display: flex; flex-direction: row;" class="serch-form" method="post" id="friend-form">
+                        <i class="bi bi-search serch-img"></i><!-- 
+                        --><input class="serch friends-serch" type="text" placeholder="Поиск">
+                    </form>
+                </div>
+                <div class="friends-div">
+                    {% for i in range(friends) %}
+                        <div class="friend-info">
+                            <div class="avatar-and-name-friend">
+                                <div class="friend-avatar-box">
+                                    <a href="/id/{{friend_id[i]}}"><img class="friend-avatar" src="{{friend_avatar[i]}}" alt=""></a>
+                                </div>
+                                <p class="name-friend">{{friend_name[i]}}</p><p class="name-friend">{{friend_surname[i]}}</p>
+                            </div>
+                            <div class="block-with-buttons-actFriend">
+                                <a href="/private_chat/{{chat_id[i]}}"><div data-tooltip="Написать" class="button-act-with-friend"><i class="bi bi-chat"></i></div></a>
+                                {% if is_block[i] %}
+                                    <a href="/unblock/{{friend_id[i]}}"><div data-tooltip="Разблокировать" class="button-act-with-friend"><i style="color: green;" class="bi bi-person"></i></div></a>
+                                {% else %}
+                                    <a href="/block/{{friend_id[i]}}"><div data-tooltip="Заблокировать" class="button-act-with-friend block-friend-button"><i class="bi bi-person-x"></i></div></a>
+                                {% endif %}
+                                <a href="/delete_friend/{{friend_id[i]}}"><div data-tooltip="Удалить из друзей" class="button-act-with-friend trash-friend-button"><i class="bi bi-trash3"></i></div></a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <script>
+                    const searchInput = document.querySelector(".friends-serch");
+
+                    document.getElementById('friend-form').addEventListener('submit', function(event) {
+                        event.preventDefault();
+                    });
+                    
+                    searchInput.addEventListener('input', function(event) {
+                        const searchValue = event.target.value.toLowerCase();
+                        let all_friends = document.getElementsByClassName('friend-info');
+                    
+                        for (let i = 0; i < all_friends.length; i++) {
+                            let name_elements = all_friends[i].getElementsByClassName("name-friend");
+                            let fullName = "";
+                    
+                            // Собираем полное имя из всех элементов с классом name-friend
+                            for (let j = 0; j < name_elements.length; j++) {
+                                fullName += name_elements[j].textContent + " ";
+                            }
+                    
+                            fullName = fullName.trim().toLowerCase();
+                        
+                            if (!fullName.includes(searchValue)) {
+                                all_friends[i].hidden = true;
+                            } 
+                            else {
+                                all_friends[i].hidden = false;
+                            }
+                        }
+                    });
+                    
+                    searchInput.addEventListener('keydown', function(event) {
+                        if (event.key === 'Enter') {
+                            event.preventDefault();
+                        }
+                    });
+                   </script>
+{% endblock %}

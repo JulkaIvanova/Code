@@ -1,0 +1,49 @@
+body {
+    background: url('../img/background.avif');
+    background-size: 100vw 100vh;
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 0;
+    margin: 0;
+    justify-content: center;
+    align-items: center;
+}
+
+.authorization{
+    display: block;
+    box-sizing: border-box;
+    width: 388px;
+    height: 444px;
+    padding: 28px;
+    background-color: #151515;
+    border-radius: 20px;
+    
+}
+
+.button{
+    font-size: 20px;
+    width: 100%;
+}
+
+.login_form{
+    text-align: center;
+    
+}
+
+.title{
+    color: #0D6EFD;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.titleH5{
+    text-align: left;
+    color: #0D6EFD;
+}
+.text-color{
+    color: #ffffff;
+}
+

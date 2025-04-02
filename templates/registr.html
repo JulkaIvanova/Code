@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
+    integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
+    crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="../static/css/style_registration.css" />
+    <title>Code</title>
+    <link rel="icon" href="../static/img/logo.png">
+</head>
+<body>
+    <div id="authorithation" class="authorization">
+        <h1 id="title" class="title">Давайте знакомиться!</h1>
+        {% if message %}
+            <div class="alert alert-danger" role="alert">{{ message }}</div>
+        {% endif %}
+        <form class="login_form" method="post">
+            <div style="display: block;" id="1">
+                {{ form.csrf_token }}
+                <div class="form-group">
+                    {{ form.surname(class="form-control", placeholder="Введите Вашу фамилию", id='surname') }}
+                </div>
+                <div class="form-group">
+                    <br>
+                    {{ form.name(class="form-control", placeholder="Введите Ваше имя", id='name') }}
+                </div>
+                <br>
+                <button id="btn-1" class="btn btn-primary button">Продолжить</button>
+            </div>
+            <div id="2" style="display: none;">
+                {{ form.csrf_token }}
+                <div class="form-group">
+                    {{ form.age(class="form-control", placeholder="Введите Ваш возраст", id='age') }}
+                </div>
+                <br>
+                <h5 class="titleH5">Выберите Ваш город</h5>
+                <div class="form-group">
+                    {{ form.city(class="form-control", id='city') }}
+                </div>
+                <br>
+                <h5 class="titleH5">Укажите свой пол</h5>
+                <div class="form-group">
+                    <div class="form-check">
+                        {{ form.sex }}
+                    </div>
+                </div>
+                <br>
+                <button id="btn-2" class="btn btn-primary button">Продолжить</button>
+            </div>
+            <div id="3" style="display: none;">
+                {{ form.csrf_token }}
+                <div class="form-group">
+                    {{ form.email(class="form-control", placeholder="Введите адрес почты", id='email') }}
+                </div>
+                <br>
+                <div class="form-group">
+                    {{ form.password(class="form-control", placeholder="Придумайте пароль", id='password') }}
+                </div>
+                <br>
+                <div class="form-group">
+                    {{ form.password_repeat(class="form-control", placeholder="Повторите пароль", id='password_repeat') }}
+                </div>
+                <br>
+                {{ form.submit(class="btn btn-primary button") }}
+            </div>
+        </form>
+    </div>
+    <script>
+        let name = document.getElementById("name")
+        let surname = document.getElementById("surname")
+        name.required = true
+        surname.required = true
+        let city = document.getElementById("city")
+        let age = document.getElementById("age")
+        let sex = document.getElementById("sex")
+        let password = document.getElementById("password")
+        let password_repeat = document.getElementById("password_repeat")
+        let email = document.getElementById("email")
+
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     name.value = ""
+        //     surname.value = ""
+        //     city.value = ""
+        //     age.value = ""
+        //     sex.value = ""
+        //     password.value = NaN
+        //     password_repeat.value = NaN
+        //     email.value = NaN
+        // })
+
+        let background_div = document.getElementById("authorithation")
+        
+        let contaner_1 = document.getElementById("1");
+        let btn_1 = document.getElementById("btn-1");
+
+        let contaner_2 = document.getElementById("2");
+        let btn_2 = document.getElementById("btn-2");
+        let text_2 = "Немного о себе";
+
+        let contaner_3 = document.getElementById("3");
+        let text_3 = "Последний шаг";
+
+        let title = document.getElementById("title");
+
+        function set_contaner_2(e){
+            console.log(e)
+            e.preventDefault();
+            console.log(name.value == "", surname.value == "")
+            if (name.value == "" | surname.value == ""){
+                console.log("sssss")
+                if (name.value == ""){
+                    name.style.border = 'solid red 1px'
+                    setTimeout(function(){
+                        name.style.border = 'none'
+                    }, 2 * 1000);
+                }
+                if (surname.value == ""){
+                    surname.style.border = 'solid red 1px'
+                    setTimeout(function(){
+                        surname.style.border = 'none'
+                    }, 2 * 1000);
+                }
+                return
+            }
+            city.required = true
+            age.required = true
+            sex.required = true
+            background_div.style.height = '530px'
+            contaner_1.style.display = 'none';
+            contaner_2.style.display = 'block';
+            contaner_3.style.display = 'none';
+            title.innerHTML = text_2;
+        }
+        //recuared = true
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     // Проверка видимости перед валидацией
+        //     function validateForm() {
+        //         const ageInput = document.querySelector('input[name="age"]');
+        //         if (ageInput.offsetParent === null) {
+        //             // Если поле скрыто, удаляем required
+        //             ageInput.removeAttribute('required');
+        //         }
+        //     }
+        // });
+
+        function set_contaner_3(e){
+            e.preventDefault();
+            console.log(+age.value)
+            console.log(isNaN(+age.value))
+            if (isNaN(+age.value) | age.value == 0){
+                console.log('uuuuuu')
+                age.style.border = 'solid red 1px'
+                setTimeout(function(){
+                    age.style.border = 'none'
+                }, 2 * 1000);
+                return
+            }
+            if (city.value == "" | sex.value == "" | age.value == ""){
+                return
+            }
+            password.required = true
+            password_repeat.required = true
+            email.required = true
+            background_div.style.height = '444px'
+            contaner_1.style.display = 'none';
+            contaner_3.style.display = 'block';
+            contaner_2.style.display = 'none';
+            title.innerHTML = text_3;
+        }
+
+        btn_1.addEventListener("click", set_contaner_2);
+        btn_2.addEventListener("click", set_contaner_3);
+    </script>
+</body>
+</html>

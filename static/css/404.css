@@ -1,0 +1,88 @@
+body{
+    background-color: #151515;
+}
+
+.transpert-text{
+    color: #151515;
+    text-shadow: 1px 1px lightgray, -1px -1px lightgray;
+}
+
+@supports (-webkit-text-stroke: 0.5px lightgray) {
+    .transpert-text {
+        color: transparent;
+        -webkit-text-stroke: 0.5px lightgray;
+        text-shadow: none;
+    }
+}
+
+.block-with-content{
+    position: absolute;
+    width: 500px; height: 500px;
+    top:0; bottom: 0; left: 0px; right: 0px;
+    margin: auto;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* border: red 1px solid; */
+}
+
+.text{
+    font-size: 70px;
+    font-family: 'Bebas Neue';
+}
+
+.return-href{
+    position: absolute;
+    bottom: 0;
+    left: 0; right: 0;
+}
+
+/* .logo{
+    position: absolute;
+    z-index: -1;
+    filter: grayscale(1);
+    opacity: 30%;
+    width: auto; height: 150%;
+    right: -200px; bottom: 0; top: 0;
+    margin: auto 0;
+} */
+
+/* .shaow ::before{
+    content: "jjjkjjjjjjjjjjjjjjjjj";
+    font-size: 70px;
+    color: lightgray;
+} */
+
+.block-with-content2{
+    position: absolute;
+    width: 500px; height: 500px;
+    top:-10px; left: 0px;
+    z-index: 9;
+    color: #949494;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* border: red 1px solid; */
+}
+
+.contaner{
+    position: absolute; 
+    left: 0; top: 0; right: 0; bottom: 0;
+    width: 500px; height: 500px;
+    margin: auto;
+}
+
+
+/* .block-with-content3{
+    position: absolute;
+    width: 500px; height: 500px;
+    top:25px; left: 55px;
+    z-index: -2;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+} */

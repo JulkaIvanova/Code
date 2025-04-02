@@ -1,0 +1,91 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
+        integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
+        crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+        <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="../static/css/post_block.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+        <title>Пейзажи Марса</title>
+    </head>
+<body> -->
+{% extends "personal_page.html" %}
+{% block posts %}
+    {% for i in range(cntBlocks) %}
+        <div class="wrapper-carousel">
+            <div id={{id[i][1::]}} class="carousel slide">
+                <div class="carousel-inner">
+                {% for img in imgs[i] %}
+                    <div class="clear-fix adjust-img">
+                        <div class="carousel-item active">
+                            <img id="img" src={{img}} class="d-block w-100" alt="...">
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target={{id[i]}} data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Предыдущий</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target={{id[i]}} data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Следующий</span>
+                </button>            
+            </div>
+            <div class="caption">
+                <p><p>{{caption[i]}}</p></p>
+            </div>
+            <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                <div class="likes-and-comments">
+                    {% if likesBool[i] == 1 %}
+                        <div data-bool={{likesBool[i]}} id={{i}} class="likes"><i class="bi bi-heart-fill"></i><span style="padding-left: 10px; width: 80%;">{{postCntLikes[i]}}</span></div>
+                    {% else %}
+                        <div data-bool={{likesBool[i]}} id={{i}} class="likes"><i class="bi bi-heart"></i><span style="padding-left: 10px; width: 80%;">{{postCntLikes[i]}}</span></div>
+                    {% endif%}
+                    <a style="display: block;" href="/chat/{{chat_id[i]}}"><div class="comments"><i class="bi bi-chat-left"></i><span style="padding-left: 10px;">{{postCntComments[i]}}</span></div></a>
+                </div>
+                {% if postCreators[i] == current_user.id %}
+                    <div style="text-align: right;"><i onclick="event.stopPropagation()" class="more bi bi-three-dots-vertical"></i></div>
+                {% endif %}
+            </div>
+            <div class="edit-del" hidden>
+                <a href="/edit_post/{{ post_id[i] }}" class="item-edit-del edit-post"><i class="bi bi-pencil"></i><span style="padding-left: 10px;">Изменить пост</span></a>
+                <a href="/del_post/{{ post_id[i] }}" class="item-edit-del del-post"><i class="bi bi-trash3"></i><span style="padding-left: 10px;">Удалить пост</span></a>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}
+    <!-- <script>
+        let contaner = document.getElementsByClassName('likes');
+        let flags = []
+        if (contaner.length) {
+            for (let i=0; i<contaner.length; i++ ){
+                let con = contaner[i];
+                let buttonLikes = con.querySelector('i');
+                buttonLikes.addEventListener("click", cntLikesUp);
+                if (con.dataset.bool == '1') flags.push(true);
+                else flags.push(false);
+            }
+        }
+        function cntLikesUp() {
+            let likeContaner = this.parentElement;
+            if (flags[+(likeContaner.id)]) return;
+            let cntLikes = likeContaner.querySelector('span').innerText;
+            this.className = "bi bi-heart-fill";
+            cntLikes = +cntLikes + 1;
+            likeContaner.querySelector('span').innerText = cntLikes;
+            flags[+(likeContaner.id)] = true
+        }
+        
+    </script> -->
+    </div>
+</body>
+</html>

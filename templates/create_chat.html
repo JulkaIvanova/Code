@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Code</title>
+        <link rel="icon" href="../static/img/logo.png">
+        <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
+        integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
+        crossorigin="anonymous">
+         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+            <!-- <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet"> -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+        <link rel="stylesheet" type="text/css" href="../static/css/style.css" />
+        
+        
+    </head>
+<body>
+    <h1 style="text-align: center; color: white; margin-bottom: 20px; margin-top: 10px;">Создание чата</h1>
+    <div class="create-chat-container">
+        <!-- Список друзей -->
+        <div class="friends-list">
+            <form style="position: static; top: 0; margin-bottom: 15px; width: 100%; display: flex; flex-direction: row;" class="serch-form" method="post" id="friend-form">
+                <i style="margin-left: 0;" class="bi bi-search serch-img"></i><!-- 
+                --><input class="serch friends-serch" type="text" placeholder="Поиск">
+            </form>
+            {% for i in range(friends) %}
+                <div class="friend-item" data-friend-id="{{friend_id[i]}}">
+                    <div class="avatar-and-name-friend">
+                        <div class="friend-avatar-box-create-chat">
+                            <a href="/id/{{friend_id[i]}}"><img class="friend-avatar-create-chat" src="{{friend_avatar[i]}}" alt=""></a>
+                        </div>
+                        <p style="margin-right: 10px;" class="name-friend-create-chat">{{friend_name[i]}}</p>
+                        <p class="name-friend-create-chat">{{friend_surname[i]}}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    
+        <!-- Панель создания чата -->
+        <div class="chat-creation-panel">
+            <div class="selected-friends">
+                <h3 style="text-align: left;">Участники чата</h3>
+                <div class="selected-friends-list"></div>
+            </div>
+    
+            <div style="text-align: left;" class="chat-details">
+                <h3 style="text-align: left;">Настройки чата</h3>
+                <div class="chat-avatar-upload">
+                    <label for="chat-avatar">
+                        <img id="chat-avatar-preview" src="../static/img/chat.png" alt="Аватар чата">
+                    </label>
+                    <input type="file" id="chat-avatar" class="hidden" accept="image/*" hidden>
+                </div>
+                
+                <input style="margin-top: 10px; text-align: left;" type="text" class="chat-name" placeholder="Название чата">
+                <br>
+                <button style="text-align: left;" class="create-chat-button">Создать чат</button>
+            </div>
+        </div>
+    </div>
+    <div style="width: 100%; text-align: center; margin-top: 20px;"><a class="back-create-chat" href="/chats">Назад</a></div>
+    <script>
+        // Получаем основные элементы
+const friendsList = document.querySelector('.friends-list');
+const selectedFriendsList = document.querySelector('.selected-friends-list');
+const chatNameInput = document.querySelector('.chat-name');
+const chatAvatarInput = document.querySelector('#chat-avatar');
+const chatAvatarPreview = document.querySelector('#chat-avatar-preview');
+const createChatButton = document.querySelector('.create-chat-button');
+
+// Обработчик клика по друзьям
+friendsList.addEventListener('click', function(event) {
+    const friendItem = event.target.closest('.friend-item');
+    if (friendItem) {
+        const friendId = friendItem.dataset.friendId;
+        const friendAvatar = friendItem.querySelector('.friend-avatar-create-chat').src;
+        const friendName = friendItem.querySelector('.name-friend-create-chat').textContent;
+        
+        // Проверяем, не добавлен ли уже друг
+        if (!selectedFriendsList.querySelector(`[data-friend-id="${friendId}"]`)) {
+            // Создаем элемент выбранного друга
+            const selectedFriend = document.createElement('div');
+            selectedFriend.classList.add('selected-friend');
+            selectedFriend.dataset.friendId = friendId;
+            
+            selectedFriend.innerHTML = `
+                <img src="${friendAvatar}" alt="Аватар">
+                <span>${friendName}</span>
+                <button class="remove-friend">&times;</button>
+            `;
+            
+            // Добавляем возможность удаления
+            selectedFriend.querySelector('.remove-friend').addEventListener('click', function() {
+                selectedFriendsList.removeChild(selectedFriend);
+            });
+            
+            selectedFriendsList.appendChild(selectedFriend);
+        }
+    }
+});
+
+// Обработчик изменения аватара чата
+chatAvatarInput.addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            chatAvatarPreview.src = e.target.result;
+        };
+        
+        reader.readAsDataURL(file);
+    }
+});
+
+// Обработчик создания чата
+createChatButton.addEventListener('click', function() {
+    const data = {
+        chatName: chatNameInput.value,
+        avatar: chatAvatarInput.files[0] || null,
+        friends: Array.from(selectedFriendsList.children).map(friend => friend.dataset.friendId)
+    };
+    console.log(data.friends)
+    if (data.chatName == '' || data.friends.length == 0) {
+        alert("Данные заполнены некоректно");
+        return;
+    }
+    // Здесь можно отправить данные на сервер
+    console.log('Данные для создания чата:', data);
+});
+
+// Инициализация превью аватара
+if (chatAvatarPreview) {
+    chatAvatarPreview.style.width = '150px';
+    chatAvatarPreview.style.height = '150px';
+    chatAvatarPreview.style.borderRadius = '15px';
+    chatAvatarPreview.style.position = 'absolute';
+    chatAvatarPreview.style.top = '50%';
+    chatAvatarPreview.style.left = '50%';
+    chatAvatarPreview.style.transform = 'translate(-50%,-50%)';
+    chatAvatarPreview.style.objectFit= 'cover';
+}
+const searchInput = document.querySelector(".friends-serch");
+
+document.getElementById('friend-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+});
+
+searchInput.addEventListener('input', function(event) {
+    const searchValue = event.target.value.toLowerCase();
+    let all_friends = document.getElementsByClassName('friend-item');
+
+    for (let i = 0; i < all_friends.length; i++) {
+        let name_elements = all_friends[i].getElementsByClassName("name-friend-create-chat");
+        let fullName = "";
+
+        // Собираем полное имя из всех элементов с классом name-friend
+        for (let j = 0; j < name_elements.length; j++) {
+            fullName += name_elements[j].textContent + " ";
+        }
+
+        fullName = fullName.trim().toLowerCase();
+    
+        if (!fullName.includes(searchValue)) {
+            all_friends[i].hidden = true;
+        } 
+        else {
+            all_friends[i].hidden = false;
+        }
+    }
+});
+
+searchInput.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+    }
+});
+                   
+    </script>
+</body>
+</html>
+
+
+
+

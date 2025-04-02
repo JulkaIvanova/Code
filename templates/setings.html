@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %} 
+    <div class="edit-profile-form">
+        <h1 class="edit-title">Редактирование профиля</h1>
+        <form method="post">
+            {{ form2.hidden_tag() }}
+            
+            <div style="display: flex; flex-direction: row;">
+                <div class="grop-inputs">
+                    <p class="id">id: {{ form2.client_id.data }}</p>
+                    
+                    <div class="input-with-lbl">
+                        {{ form2.name.label(class="edit-label-text") }}<br>
+                        {{ form2.name(class="text-input-edit") }}
+                    </div>
+                    
+                    <div class="input-with-lbl">
+                        {{ form2.surname.label(class="edit-label-text") }}<br>
+                        {{ form2.surname(class="text-input-edit") }}
+                    </div>
+                    
+                    <div class="input-with-lbl">
+                        {{ form2.age.label(class="edit-label-text") }}<br>
+                        {{ form2.age(class="text-input-edit") }}
+                    </div>
+                </div>
+                
+                <div class="grop-inputs-file">
+                    <div class="input-file-with-lbl">
+                        {{ form2.avatar.label(class="edit-label-text") }}
+                        {{ form2.avatar(class="file-input") }}
+                    </div>
+                    
+                    <div class="input-file-with-lbl">
+                        {{ form2.background.label(class="edit-label-text") }}
+                        {{ form2.background(class="file-input") }}
+                    </div>
+                </div>
+            </div>
+            
+            <div style="border-top: 1px solid #3d3a3a; padding-top: 10px; margin-top: 30px;">
+                {{ form2.submit(class="submit") }}
+            </div>
+        </form>
+    </div>
+{% endblock %}

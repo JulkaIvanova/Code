@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% block content %} 
+<div class="chat-container">
+    <!-- Боковая панель с информацией о чате -->
+    <div class="chat-info-panel">
+        <div class="chat-avatar-box">
+            <img class="chat-avatar" src="{{chat_avatar}}" alt="Аватар чата">
+        </div>
+        
+        <div class="chat-details">
+            <h3 class="chat-name">{{chat_name}}</h3>
+            <p class="chat-participants">
+                {% for participant in chat_participants %}
+                    <div class="participant">
+                        <div class="message-avatar-box">
+                            <img style="min-width: 40px;" class="message-avatar" src="{{participant.avatar}}" alt="Аватар">
+                        </div>
+                        {{participant.name}} {{participant.surname}}
+                    </div>
+                {% endfor %}
+            </p>
+        </div>
+        
+        <button class="edit-chat-info">Редактировать</button>
+    </div>
+
+    <!-- Область сообщений -->
+    <div class="messages-container">
+        <div class="messages-list">
+            {% for message in messages %}
+                <div class="message {% if message.is_mine %}mine{% endif %}">
+                    <div class="message-avatar-box">
+                        <img class="message-avatar" src="{{message.avatar}}" alt="Аватар">
+                    </div>
+                    <div class="message-content">
+                        <p class="message-text">{{message.text}}</p>
+                        <div class="message-meta">
+                            <span class="message-author">{{message.author}}</span>
+                            <span class="message-time">{{message.time}}</span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Поле ввода сообщения -->
+        <div class="message-input">
+            <textarea class="message-textarea" placeholder="Введите сообщение..."></textarea>
+            <button class="send-message">Отправить</button>
+        </div>
+    </div>
+</div>
+<script>
+    // Получаем основные элементы
+const chatInfoPanel = document.querySelector('.chat-info-panel');
+const editChatInfoButton = document.querySelector('.edit-chat-info');
+const messagesContainer = document.querySelector('.messages-container');
+const messageInput = document.querySelector('.message-textarea');
+const sendMessageButton = document.querySelector('.send-message');
+
+// Обработчик кнопки редактирования
+editChatInfoButton.addEventListener('click', function() {
+ // Переносим данные в форму редактирования
+ const chatName = document.querySelector('.chat-name').textContent;
+ const chatAvatar = document.querySelector('.chat-avatar').src;
+ const participants = Array.from(document.querySelectorAll('.participant'))
+ .map(participant => participant.textContent);
+ 
+ // Здесь нужно добавить логику передачи данных в форму
+ // Например, через localStorage или event
+ localStorage.setItem('chatEditData', JSON.stringify({
+ name: chatName,
+ avatar: chatAvatar,
+ participants: participants
+ }));
+ 
+ // Переходим на страницу редактирования
+ window.location.href = '/edit_private_chat';
+});
+
+// Обработчик отправки сообщения
+sendMessageButton.addEventListener('click', function() {
+    const messageText = messageInput.value.trim();
+ 
+    if (messageText) {
+    // Здесь нужно добавить логику отправки сообщения на сервер
+    // Например, через AJAX запрос
+        fetch('/send-message', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                text: messageText
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+        // Добавляем сообщение в список
+        const newMessage = `
+        <div class="message mine">
+        <div class="message-avatar-box">
+        <img class="message-avatar" src="/user-avatar.png" alt="Аватар">
+        </div>
+        <div class="message-content">
+        <p class="message-text">${data.text}</p>
+        <div class="message-meta">
+        <span class="message-author">Вы</span>
+        <span class="message-time">${data.time}</span>
+        </div>
+        </div>
+        </div>
+        `;
+ 
+        // Продолжаем предыдущий код
+        messagesContainer.querySelector('.messages-list').insertAdjacentHTML('beforeend', newMessage);
+
+        // Прокручиваем до последнего сообщения
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+        messageInput.value = ''; // Очищаем поле ввода
+        });
+    }
+});
+// Обработчик ввода с клавиатуры
+messageInput.addEventListener('keyup', function(event) {
+if (event.key === 'Enter') {
+sendMessageButton.click();
+}
+});
+
+// Функция для добавления входящего сообщения
+function addIncomingMessage(messageData) {
+const newMessage = `
+<div class="message">
+<div class="message-avatar-box">
+<img class="message-avatar" src="${messageData.avatar}" alt="Аватар">
+</div>
+<div class="message-content">
+<p class="message-text">${messageData.text}</p>
+<div class="message-meta">
+<span class="message-author">${messageData.author}</span>
+<span class="message-time">${messageData.time}</span>
+</div>
+</div>
+</div>
+`;
+
+messagesContainer.querySelector('.messages-list').insertAdjacentHTML('beforeend', newMessage);
+messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// Пример реализации веб-сокетов для получения сообщений
+// (нужно настроить на сервере)
+const socket = io('/chat');
+
+socket.on('connect', function() {
+console.log('Connected to chat socket');
+});
+
+socket.on('new_message', function(message) {
+addIncomingMessage(message);
+});
+
+// Функция для получения истории сообщений
+function loadMessageHistory() {
+fetch('/messages/history')
+.then(response => response.json())
+.then(messages => {
+messages.forEach(message => {
+addIncomingMessage(message);
+});
+});
+}
+
+// Вызываем при загрузке страницы
+loadMessageHistory();
+
+// Дополнительные утилиты
+function formatTime(timestamp) {
+const date = new Date(timestamp);
+return `${date.getHours()}:${date.getMinutes()}`;
+}
+
+// Обработчик для автофокуса на поле ввода
+window.addEventListener('load', function() {
+messageInput.focus();
+});
+
+</script>
+{% endblock %}

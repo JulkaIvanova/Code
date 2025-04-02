@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block content %} 
+                <div class="create-post-div"><p id="createPost" class="create-post-button"><i style="margin-right: 10px;" class="bi bi-plus-lg"></i><span style="line-height: 50px;">Создать пост</span></p></div>
+                <div id="contaner">
+                    <div id="wrapper" class="bacground-wrapper"></div>
+                    <div class="post-form">
+                        <div class="title-create-post"><h1>Создать пост</h1></div>
+                        <form method="post" enctype="multipart/form-data">
+
+                            {{ createPostForm.hidden_tag() }}
+                            <p>{{ClientId}}</p>
+                            <div class="input-file-with-lbl-post">
+                                <i style="font-size: 60px; margin-bottom: 30px;" class="bi bi-upload"></i>
+                                <br>
+                                <label class="edit-label-text" for="imgs"><h2>Загрузите фото</h2></label>
+                                <br>
+                                {{ createPostForm.csrf_token }}
+                                {{ createPostForm.imgs(id="avatar", class="file-input") }}
+                                {% for error in createPostForm.imgs.errors %}
+                                    <span style="color: red;">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="input-caption-with-lbl">
+                                {{ createPostForm.csrf_token }}
+                                {{ createPostForm.caption(class="caption-post-input form-control", id="about", rows="4", placeholder="Напишите что-нибудь", required=True) }}
+                                {% for error in createPostForm.caption.errors %}
+                                    <span style="color: red;">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="div-with-radio-crete-post">
+                                {{ createPostForm.csrf_token }}
+                                {{ createPostForm.category() }}
+                                {% for error in createPostForm.category.errors %}
+                                    <span style="color: red;">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {{ createPostForm.submit(class="btn btn-primary submit-create") }}
+                        </form>
+                    </div>
+                </div>
+                {% block posts %}{% endblock %}
+        <script>
+            let contaner = document.getElementsByClassName('likes');
+            let flags = []
+            if (contaner.length) {
+                for (let i=0; i<contaner.length; i++ ){
+                    let con = contaner[i];
+                    let buttonLikes = con.querySelector('i');
+                    buttonLikes.addEventListener("click", cntLikesUp);
+                    if (con.dataset.bool == '1') flags.push(true);
+                    else flags.push(false);
+                }
+            }
+            function cntLikesUp() {
+                let likeContaner = this.parentElement;
+                if (flags[+(likeContaner.id)]) return;
+                let cntLikes = likeContaner.querySelector('span').innerText;
+                this.className = "bi bi-heart-fill";
+                cntLikes = +cntLikes + 1;
+                likeContaner.querySelector('span').innerText = cntLikes;
+                flags[+(likeContaner.id)] = true
+            }
+            let createPostButton = document.getElementById('createPost');
+            createPostButton.addEventListener("click", function(){
+                let block = document.getElementById('contaner');
+                let body = document.querySelector('body');
+                body.style.overflow = 'hidden';
+                block.style.display = 'block'
+                let backgroundDiv = document.getElementById('wrapper');
+                backgroundDiv.addEventListener("click", function(){
+                    body.style.overflow = 'auto';
+                    block.style.display = 'none';
+                });
+            });
+            let addPanel = document.getElementsByClassName('more');
+            if (addPanel.length){
+                for (let i = 0; i < addPanel.length; i++){
+                    addPanel[i].getElementByClassName;
+                    addPanel[i].addEventListener("click", addPanelSee);
+
+                };
+            };
+            function addPanelSee(){
+                let supportContaner = this.parentElement;
+                supportContaner = supportContaner.parentElement;
+                supportContaner = supportContaner.parentElement;
+                let panel = supportContaner.querySelector('.edit-del');
+                let panels = document.getElementsByClassName('edit-del');
+                for (let i = 0; i < panels.length; i++){
+                    if (panels[i] != panel){
+                        panels[i].hidden = true;
+                    }
+                }
+                panel.hidden = false;
+            };
+            document.onclick = function(){
+                let panels = document.getElementsByClassName('edit-del');
+                for (let i = 0; i < panels.length; i++){
+                    if (panels[i].hidden == false){
+                        panels[i].hidden = true;
+                    };
+                };
+            };
+        </script>
+{% endblock %}

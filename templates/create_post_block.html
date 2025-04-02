@@ -1,0 +1,59 @@
+{% extends "personal_page.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
+    integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
+    crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/create_post_block.css" />
+    <title>Document</title>
+</head>
+<body style="height: 3000px; overflow:auto;">
+    <div class="bacground-wrapper"></div>
+    <div class="post-form">
+        <div class="title-create-post"><h1>Создать пост</h1></div>
+        <form method="post" action="/id/{{ClientId}}" enctype="multipart/form-data">
+            <div class="input-file-with-lbl-post">
+                <i style="font-size: 60px; margin-bottom: 30px;" class="bi bi-upload"></i>
+                <br>
+                <label class="edit-label-text" for='avatar'><h2>Загрузите фото</h2></label>
+                <br>
+                <input id="avatar" class="file-input" type="file" multiple>
+            </div>
+            <div class="input-caption-with-lbl">
+                <textarea class="caption-post-input form-control" id="about" rows="4" name="about" placeholder="Напишите что-нибудь" required></textarea>
+            </div>
+            <div class="div-with-radio-crete-post">
+                <div>
+                    <label class="radio-label" for="common">#Общее</label>
+                    <input type="radio" required name="categori" id="common">
+                </div>
+
+                <div>
+                    <label class="radio-label" for="guide">#Гайды</label>
+                    <input type="radio" required name="categori" id="guide">
+                </div>
+
+                <div>
+                    <label class="radio-label" for="mems">#Мемы</label>
+                    <input type="radio" required name="categori" id="mems">
+                </div>
+
+                <div>
+                    <label class="radio-label" for="ideas">#Идеи</label>
+                    <input type="radio" required name="categori" id="ideas">
+                </div>
+
+            </div>
+            <button type="submit" class="btn btn-primary submit-create">Готово</button>
+        </form>
+    </div>
+</body>
+</html>
+
+{% endblock %}

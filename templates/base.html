@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code</title>
+    <link rel="icon" href="../static/img/logo.png">
+    <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
+    integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
+    crossorigin="anonymous">
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <!-- <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet"> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/style.css" />
+    
+    
+</head>
+<body>
+    <header style="z-index: 99999999;">
+        <div class="wrapper">
+            <div style="text-align: left;">
+                <img src="../static/img/logo.png" class="logo">
+                <img src="../static/img/name.png" class="name">
+                <form class="serch-form" method="post">
+                    {{ form.csrf_token }}
+                    <i class="bi bi-search serch-img"></i><!-- 
+                    -->{{ form.serch_user_id(id="serch", class="serch", style="padding: 0px;", placeholder="Поиск") }}
+                </form>
+                <!-- <script>
+                    <input id="serch" class="serch" type="text" placeholder="Поиск">
+                    let form = document.getElementById('form')
+                    form.onsubmit = function(){
+                        let user_id = document.getElementById('serch').value
+                        form.action = '/id/' + user_id
+                    }
+                </script> -->
+                <div style="display: inline-block; position: relative;">
+                    {% if  cntRequests > 0 %}
+                        <img style="position: absolute; top:3px; left: 14px; width: 8px;" src="../static/img/notice.png">
+                    {% endif %}
+                    <i onclick="event.stopPropagation()" class="bi bi-bell bell-style"></i>   
+                    <div class="friends-request-div" hidden>
+                        {% if cntRequests == 0 %}
+                            <p style="color: white; text-align: center; margin-bottom: 0">Пусто</p>
+                        {% else %}
+                            {% for i in range(cntRequests) %}
+                                <div class="friend-request-info">
+                                    <div class="avatar-and-name-friend">
+                                        <div class="friend-request-avatar-box">
+                                            <a href="/id/{{friend_request_id[i]}}"><img class="friend-request-avatar" src="{{friend_request_avatar[i]}}" alt=""></a>
+                                        </div>
+                                        <p class="name-request-friend">{{friend_request_name[i]}}</p><p class="name-request-friend">{{friend_request_surname[i]}}</p>
+                                    </div>
+                                    <div class="block-with-buttons-actFriend">
+                                        <a href="/accept_request/{{friend_request_id[i]}}"><div data-tooltipRequest="Принять" class="button-act-with-friend"><i style="color: green;" class="bi bi-person-check-fill"></i></div></a>
+                                        <a href="/reject_request/{{friend_request_id[i]}}"><div data-tooltipRequest="Отклонить" class="button-act-with-friend trash-friend-button"><i class="bi bi-person-x-fill"></i></div></a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        <script>
+                            let bell = document.querySelector(".bi-bell");
+                            bell.addEventListener('click', function(){
+                                document.querySelector(".friends-request-div").hidden = false;
+                            });
+                            document.addEventListener('click', function(){
+                                document.querySelector(".friends-request-div").hidden = true;
+                            });
+                        </script>
+                    </div>
+                </div>
+            </div>
+            <div style="text-align: right; min-width: 30px;">
+                <div class="avatar-box-heder">
+                    {% if CurrentUserAvatar %}
+                        <a id="avatar-img-heder-linck" href={{ClientId}}><img class="avatar-img-heder" src="{{CurrentUserAvatar}}" alt=""></a>
+                    {% else %}
+                        <a id="avatar-img-heder-linck" href={{ClientId}}><img class="avatar-img-heder" src="../static/img/avatar.jpg"></a>
+                    {% endif %}
+                </div>
+                <!-- <a href={{ClientId}}><img class="icon-img-client" src="../static/img/avatar.jpg" height="30px"></a> -->
+            </div>
+        </div>
+    </header>
+    <main>
+        <div class="something">
+            <div class="menu">
+                <ul>
+                    <li class="menu-li"><a href="/settings"><i style="margin-right: 7px;" class="bi bi-gear"></i>Настройки</a></li>
+                    <li class="menu-li"><a href="/chats"><i style="margin-right: 7px;" class="bi bi-chat"></i>Чаты</a></li>
+                    <li class="menu-li"><a href="/main"><i style="margin-right: 7px;" class="bi bi-postcard-fill"></i>Лента</a></li>
+                    <li class="menu-li"><a href="/friends"><i style="margin-right: 7px;" class="bi bi-people-fill"></i>Друзья</a></li>
+                    <li class="menu-li"><a href="/likes"><i style="margin-right: 7px;" class="bi bi-heart"></i>Лайки</a></li>
+                    {% if seeFilter %}
+                    <li class="menu-li">
+                        <p id="bi-sliders2" style="margin-bottom: 0;"><i style="margin-right: 7px;" class="bi bi-sliders2"></i>Фильтры</p>
+                        <div class="filter-buttons" hidden>
+                            <input type="radio" id="all" name="filter" value="all" onclick="updateURL('all')">
+                            <label for="all">Общее</label>
+                            <br>
+                            <input type="radio" id="memes" name="filter" value="memes" onclick="updateURL('memes')">
+                            <label for="memes">Мемы</label>
+                            <br>
+                            <input type="radio" id="ideas" name="filter" value="ideas" onclick="updateURL('ideas')">
+                            <label for="ideas">Идеи</label>
+                            <br>
+                            <input type="radio" id="guides" name="filter" value="guides" onclick="updateURL('guides')">
+                            <label for="guides">Гайды</label>
+                            <br>
+                            <input type="radio" id="nofilter" name="filter" value="" checked onclick="updateURL('')">
+                            <label for="nofilter">Без фильтров</label>
+                        </div>
+                        <script>
+                            function updateURL(filter) {
+                            const currentURL = new URL(window.location.href);
+                            
+                            if (filter) {
+                                currentURL.searchParams.set('filter', filter);
+                            } else {
+                                currentURL.searchParams.delete('filter');
+                            }
+                            
+                            history.pushState({}, '', currentURL.href);
+                        }
+
+                        // При загрузке страницы проверяем текущий URL и выбираем соответствующую радиокнопку
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const urlParams = new URLSearchParams(window.location.search);
+                            const currentFilter = urlParams.get('filter');
+                            
+                            if (currentFilter) {
+                                document.querySelector(`input[name="filter"][value="${currentFilter}"]`).checked = true;
+                            }
+                        });
+                        let filterButton = document.querySelector("#bi-sliders2");
+                        let cntClick = 0;
+                        filterButton.addEventListener("click", function(){
+                            let filters = document.querySelector(".filter-buttons")
+                            cntClick += 1;
+                            if (filters.hidden & cntClick < 4) filters.hidden = false;
+                            else {
+                                filters.hidden = true;
+                                cntClick = 0;
+                            }
+                        });
+                        </script>
+                    </li>
+                    {% endif %}
+                    {% if current_user.is_authenticated %}
+                        <li style="color: red;" class="menu-li"><a style="color: red;" href="/logout"><i style="margin-right: 7px; color: red;" class="bi bi-box-arrow-right"></i>Выйти</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="user-info">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </main>
+</body>
+</html>
