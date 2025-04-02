@@ -1,5 +1,5 @@
 import flask as f
-from flask import render_template, request, redirect, flash, url_for
+from flask import render_template, request, redirect, flash, url_for, jsonify
 import os
 from werkzeug.utils import secure_filename
 from flask_login import (
@@ -452,6 +452,46 @@ def chats():
                             friend_request_surname=['ggggg', 'jjjjj'],
                             seeFilter = False)
     return html
+
+
+
+
+#--------------TEST---------------------------
+from flask import request, jsonify
+
+@app.route('/api/like', methods=['POST'])
+def handle_like():
+    try:
+        data = request.get_json()
+        
+        # Проверяем наличие всех необходимых полей
+        required_fields = ['postId', 'userId', 'likesCount']
+        if not all(field in data for field in required_fields):
+            return jsonify({'error': 'Missing required fields'}), 400
+
+        # Получаем данные
+        post_id = data['postId']
+        user_id = data['userId']
+        likes_count = data['likesCount']
+
+        # Здесь вы можете обработать данные (сохранить в БД и т.д.)
+        print(f"Получен лайк: Пост {post_id}, Пользователь {user_id}, Лайков: {likes_count}")
+
+        # Возвращаем успешный ответ
+        return jsonify({
+            'status': 'success',
+            'message': 'Like processed',
+            'postId': post_id,
+            'newLikesCount': likes_count
+        }), 200
+
+    except Exception as e:
+        print(f"Ошибка при обработке лайка: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500 
+        
+#--------------TEST---------------------------
+
+
 
 @app.route("/settings", methods=["GET", "POST"])
 def settings():

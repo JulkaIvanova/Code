@@ -74,16 +74,74 @@
                     else flags.push(false);
                 }
             }
+            async function sendLikeToServer(postId, userId, likesCount) {
+                try {
+                    const response = await fetch('/api/like', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            postId: postId,
+                            userId: userId,
+                            likesCount: likesCount
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Ошибка при отправке лайка');
+                    }
+
+                    const result = await response.json();
+                    console.log('Лайк сохранен:', result);
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                }
+            }
+
+            // function cntLikesUp() {
+            //     let likeContaner = this.parentElement;
+            //     if (flags[+(likeContaner.id)]) return;
+            //     let cntLikes = likeContaner.querySelector('span').innerText;
+            //     this.className = "bi bi-heart-fill";
+            //     cntLikes = +cntLikes + 1;
+            //     likeContaner.querySelector('span').innerText = cntLikes;
+            //     let support = likeContaner.parentElement
+            //     support = support.parentElement
+            //     support = support.parentElement
+            //     let currentPost = support.querySelector(".carousel")
+            //     console.log(currentPost.id)
+            //     console.log(support)
+            //     let a = document.querySelector("#avatar-img-heder-linck").href
+            //     console.log(a.split("id/")[1])
+            //     flags[+(likeContaner.id)] = true;
+
+            //     let currentPostId = currentPost.id
+            //     let currentUserId = a.split("id/")[1]
+
+            // }
             function cntLikesUp() {
                 let likeContaner = this.parentElement;
                 if (flags[+(likeContaner.id)]) return;
+                
                 let cntLikes = likeContaner.querySelector('span').innerText;
                 this.className = "bi bi-heart-fill";
                 cntLikes = +cntLikes + 1;
                 likeContaner.querySelector('span').innerText = cntLikes;
-                console.log(likeContaner.parentElement.parentElement.id)
-                console.log(document.querySelector("#avatar-img-heder-linck").href)
+                
+                let support = likeContaner.parentElement;
+                support = support.parentElement;
+                support = support.parentElement;
+                let currentPost = support.querySelector(".carousel");
+                
+                let a = document.querySelector("#avatar-img-heder-linck").href;
                 flags[+(likeContaner.id)] = true;
+
+                let currentPostId = currentPost.id;
+                let currentUserId = a.split("id/")[1];
+
+                // Вызываем функцию отправки на сервер
+                sendLikeToServer(currentPostId, currentUserId, cntLikes);
             }
             let createPostButton = document.getElementById('createPost');
             createPostButton.addEventListener("click", function(){
