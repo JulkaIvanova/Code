@@ -460,7 +460,7 @@ def chats():
 from flask import request, jsonify
 
 @app.route('/api/like', methods=['POST'])
-def handle_like():
+def test1():
     try:
         data = request.get_json()
         
@@ -487,7 +487,90 @@ def handle_like():
 
     except Exception as e:
         print(f"Ошибка при обработке лайка: {str(e)}")
-        return jsonify({'error': 'Internal server error'}), 500 
+        return jsonify({'error': 'Internal server error'}), 500
+
+#ВНИМАНИЕ!!!: данная функция пока работает некоректно (однако моей задачей в данный момент было имено отправить данные) картинка отправляется, чтобы её прочитать используйте read()
+import os
+from werkzeug.utils import secure_filename
+from flask import request, jsonify
+import time
+# Конфигурация
+UPLOAD_FOLDER = 'static/chat_avatars'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/api/chats/create', methods=['POST'])
+def test2():
+    try:
+        # Включим подробное логирование
+        print("\n=== Полученные данные ===")
+        print("Form data:", request.form)
+        print("Files:", request.files)
+        
+        # Проверяем наличие файла
+        if 'avatar_file' not in request.files:
+            print("Файл не найден в запросе")
+            return jsonify({'error': 'Файл не был отправлен'}), 400
+            
+        file = request.files['avatar_file']
+        
+        # Проверяем, что файл был действительно загружен
+        if file.filename == '':
+            print("Пустое имя файла")
+            return jsonify({'error': 'Не выбран файл'}), 400
+            
+        if not file:
+            print("Файл не получен")
+            return jsonify({'error': 'Ошибка при загрузке файла'}), 400
+
+        # Логируем информацию о файле
+        print("\n=== Информация о файле ===")
+        print(f"Имя: {file.filename}")
+        print(f"Тип: {file.content_type}")
+        print(f"Размер: {file.content_length} байт")
+        print(f"Заголовки: {list(file.headers.items())}")
+        print(file.read(100))
+        # Проверяем размер файла
+        if file.content_length > 2 * 1024 * 1024:  # 2MB
+            return jsonify({'error': 'Файл слишком большой (макс. 2MB)'}), 400
+
+        # Проверяем расширение
+        if not allowed_file(file.filename):
+            return jsonify({'error': 'Недопустимый тип файла'}), 400
+
+        # Сохраняем файл
+        filename = secure_filename(file.filename)
+        unique_name = f"{int(time.time())}_{filename}"
+        save_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_name)
+        
+        print(f"Сохраняем файл как: {save_path}")
+        file.save(save_path)
+        print("Файл успешно сохранен")
+
+        # Получаем остальные данные
+        chat_name = request.form.get('chatName')
+        friends = request.form.get('friends')
+        
+        if not chat_name or not friends:
+            return jsonify({'error': 'Не хватает данных'}), 400
+
+        # Здесь должна быть ваша логика создания чата в БД
+        # ...
+        
+        return jsonify({
+            'status': 'success',
+            'chatId': 123,
+            'avatarUrl': f"/static/chat_avatars/{unique_name}"
+        })
+
+    except Exception as e:
+        print(f"\n!!! Ошибка: {str(e)}")
+        return jsonify({'error': 'Внутренняя ошибка сервера'}), 500
         
 #--------------TEST---------------------------
 

@@ -117,20 +117,63 @@ chatAvatarInput.addEventListener('change', function(event) {
     }
 });
 
-// Обработчик создания чата
+async function createChat(data) {
+    try {
+        const formData = new FormData();
+        formData.append('chatName', data.chatName);
+        formData.append('friends', JSON.stringify(data.friends));
+        
+        // Ключевое изменение - добавляем файл с правильным именем
+        if (data.avatar) {
+            formData.append('avatar_file', data.avatar); // Явно указываем имя поля для файла
+            console.log('Файл для отправки:', {
+                name: data.avatar.name,
+                size: data.avatar.size,
+                type: data.avatar.type
+            });
+        }
+
+        // Отладочная информация
+        console.log('Отправляемые данные FormData:');
+        for (let [key, value] of formData.entries()) {
+            console.log(key, value);
+        }
+
+        const response = await fetch('/api/chats/create', {
+            method: 'POST',
+            body: formData
+            // Не устанавливаем Content-Type вручную!
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Ошибка сервера');
+        }
+
+        const result = await response.json();
+        console.log('Ответ сервера:', result);
+        window.location.href = `/chat/${result.chatId}`;
+        
+    } catch (error) {
+        console.error('Ошибка:', error);
+        alert(`Ошибка создания чата: ${error.message}`);
+    }
+}
+
+// Модифицированный обработчик кнопки
 createChatButton.addEventListener('click', function() {
     const data = {
         chatName: chatNameInput.value,
         avatar: chatAvatarInput.files[0] || null,
         friends: Array.from(selectedFriendsList.children).map(friend => friend.dataset.friendId)
     };
-    console.log(data.friends)
-    if (data.chatName == '' || data.friends.length == 0) {
-        alert("Данные заполнены некоректно");
+
+    if (data.chatName.trim() === '' || data.friends.length === 0) {
+        alert("Название чата обязательно и нужно выбрать хотя бы одного участника");
         return;
     }
-    // Здесь можно отправить данные на сервер
-    console.log('Данные для создания чата:', data);
+
+    createChat(data);
 });
 
 // Инициализация превью аватара
