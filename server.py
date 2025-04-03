@@ -20,7 +20,7 @@ from data.private_chats import PrivateChat
 from forms.create_post_form import CreatePostForm
 from forms.registr_form import *
 from forms.serch_user import SerchUserForm
-
+from forms.edit_post_form import EditPostForm
 
 app = f.Flask(__name__)
 db_session.global_init("db/Code.db")
@@ -455,6 +455,33 @@ def chats():
     return html
 
 
+@app.route('/edit_post/<post_id>', methods=['POST', 'GET'])
+def edit_post(post_id):
+    if not current_user.is_authenticated:
+        return redirect("/")
+    form = SerchUserForm()
+    if form.validate_on_submit() and form.serch_user_id.data:
+        return redirect(f"/id/{form.serch_user_id.data}")
+    form1 = EditPostForm()
+    if request.method == "GET":
+        # Здесь нужно описать то как данные о посте достаются из бд
+        post_id = int(post_id)
+        caption = "Описание 1"
+        form1.caption.data = caption
+
+        return render_template("edit_post.html", createPostForm=form1, post_id=post_id, form=form,
+                            ClientId = f'/id/{current_user.id}',
+                             cntRequests=2,
+                            friend_request_id=[2, 3],
+                            friend_request_avatar=['../static/img/post_test_2.jpg', '../static/img/logo.png'],
+                            friend_request_name=['rrrrr', 'hhhhhh'],
+                            friend_request_surname=['ggggg', 'jjjjj'],
+                            seeFilter = False )
+    elif request.method == "POST":
+        if form1.validate_on_submit():
+            #нужно внести изменения в БД
+            print(form1.caption.data)
+            return redirect("/main")
 
 #!!!ВАЖНЫЙ КОМЕНТ: все с блоки с пометкой TEST написаны лишь для проверки и не являются полноценными, однако могут помочь в разработке в дальнейшем
 #--------------TEST---------------------------
@@ -539,7 +566,10 @@ def test2():
     except Exception as e:
         print(f"\n!!! Ошибка: {str(e)}")
         return jsonify({'error': 'Внутренняя ошибка сервера'}), 500
-        
+    
+
+
+    
 #--------------TEST---------------------------
 
 

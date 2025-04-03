@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="position: relative; z-index: 10; height: 400px;" class="post-form">
+    <div class="title-create-post"><h1>Редактировать пост №{{post_id}}</h1></div>
+    <form method="post" enctype="multipart/form-data">
+
+        {{ createPostForm.hidden_tag() }}
+        <div style="position: relative;" class="input-caption-with-lbl">
+            {{ createPostForm.csrf_token }}
+            {{ createPostForm.caption(class="caption-post-input form-control", id="about", rows="8", placeholder="Напишите что-нибудь", required=True) }}
+            {% for error in createPostForm.caption.errors %}
+                <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+        </div>
+        {{ createPostForm.submit(class="btn btn-primary submit-create") }}
+    </form>
+</div>
+{% endblock %}

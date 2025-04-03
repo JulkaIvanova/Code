@@ -11,7 +11,7 @@
                         </div>
                         <h1 class="UserName">{{UserName}}</h1>
                         {% if current_user.is_authenticated and current_user.id == serch_user %}
-                            <a class="edit-profile-button" href="/setings">Редактировать профиль</a>
+                            <a class="edit-profile-button" href="/settings">Редактировать профиль</a>
                         {% elif serch_user_in_friends %}
                             <a class="edit-profile-button" href="/private_chat/{{user_chat_id}}">Написать</a>
                         {% elif serch_user in requests %}
@@ -31,7 +31,6 @@
                         <form method="post" enctype="multipart/form-data">
 
                             {{ createPostForm.hidden_tag() }}
-                            <p>{{ClientId}}</p>
                             <div class="input-file-with-lbl-post">
                                 <i style="font-size: 60px; margin-bottom: 30px;" class="bi bi-upload"></i>
                                 <br>
