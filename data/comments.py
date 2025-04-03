@@ -17,6 +17,7 @@ class Comments(SqlAlchemyBase, SerializerMixin):
     sender = sqlalchemy.Column(
         sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id")
     )
+    type = sqlalchemy.Column(sqlalchemy.String)
     # post = orm.relationship("Posts")
     user = orm.relationship("User")
 

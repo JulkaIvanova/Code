@@ -26,10 +26,13 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     post_like_common_category_ids = sqlalchemy.Column(sqlalchemy.String)
     friends_ids = sqlalchemy.Column(sqlalchemy.String)
     friends_requests = sqlalchemy.Column(sqlalchemy.String)
+    own_requests = sqlalchemy.Column(sqlalchemy.String)
     chats_ids = sqlalchemy.Column(sqlalchemy.String)
     img_profile = sqlalchemy.Column(sqlalchemy.String)
     img_avatar = sqlalchemy.Column(sqlalchemy.String)
     sex = sqlalchemy.Column(sqlalchemy.String)
+    blocked_users = sqlalchemy.Column(sqlalchemy.String)
+    private_chat_ids = sqlalchemy.Column(sqlalchemy.String)
     modified_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
 
 

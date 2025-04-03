@@ -152,7 +152,7 @@ async function createChat(data) {
 
         const result = await response.json();
         console.log('Ответ сервера:', result);
-        window.location.href = `/chat/${result.chatId}`;
+        window.location.href = `/chats`;
         
     } catch (error) {
         console.error('Ошибка:', error);

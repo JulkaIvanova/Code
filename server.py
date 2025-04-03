@@ -16,6 +16,7 @@ from data.comments import Comments
 from data.users import User
 from data.posts import Posts
 from data.chats import Chat
+from data.private_chats import PrivateChat
 from forms.create_post_form import CreatePostForm
 from forms.registr_form import *
 from forms.serch_user import SerchUserForm
