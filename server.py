@@ -455,7 +455,7 @@ def chats():
 
 
 
-
+#!!!ВАЖНЫЙ КОМЕНТ: все с блоки с пометкой TEST написаны лишь для проверки и не являются полноценными, однако могут помочь в разработке в дальнейшем
 #--------------TEST---------------------------
 from flask import request, jsonify
 
@@ -507,50 +507,18 @@ def allowed_file(filename):
 @app.route('/api/chats/create', methods=['POST'])
 def test2():
     try:
-        # Включим подробное логирование
-        print("\n=== Полученные данные ===")
-        print("Form data:", request.form)
-        print("Files:", request.files)
-        
-        # Проверяем наличие файла
-        if 'avatar_file' not in request.files:
-            print("Файл не найден в запросе")
-            return jsonify({'error': 'Файл не был отправлен'}), 400
-            
-        file = request.files['avatar_file']
-        
-        # Проверяем, что файл был действительно загружен
-        if file.filename == '':
-            print("Пустое имя файла")
-            return jsonify({'error': 'Не выбран файл'}), 400
-            
-        if not file:
-            print("Файл не получен")
-            return jsonify({'error': 'Ошибка при загрузке файла'}), 400
+        file = None
+        if 'avatar_file' in request.files:
+            file = request.files['avatar_file']
+            print(file.read(100))
+            # Проверяем размер файла
+            if file.content_length > 2 * 1024 * 1024:  # 2MB
+                return jsonify({'error': 'Файл слишком большой (макс. 2MB)'}), 400
 
-        # Логируем информацию о файле
-        print("\n=== Информация о файле ===")
-        print(f"Имя: {file.filename}")
-        print(f"Тип: {file.content_type}")
-        print(f"Размер: {file.content_length} байт")
-        print(f"Заголовки: {list(file.headers.items())}")
-        print(file.read(100))
-        # Проверяем размер файла
-        if file.content_length > 2 * 1024 * 1024:  # 2MB
-            return jsonify({'error': 'Файл слишком большой (макс. 2MB)'}), 400
-
-        # Проверяем расширение
-        if not allowed_file(file.filename):
-            return jsonify({'error': 'Недопустимый тип файла'}), 400
-
-        # Сохраняем файл
-        filename = secure_filename(file.filename)
-        unique_name = f"{int(time.time())}_{filename}"
-        save_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_name)
-        
-        print(f"Сохраняем файл как: {save_path}")
-        file.save(save_path)
-        print("Файл успешно сохранен")
+            # Проверяем расширение
+            if not allowed_file(file.filename):
+                return jsonify({'error': 'Недопустимый тип файла'}), 400
+            # Типо дальше сохранение но пусть это кто-нибудь сделает (ну или я но потом)
 
         # Получаем остальные данные
         chat_name = request.form.get('chatName')
@@ -565,7 +533,6 @@ def test2():
         return jsonify({
             'status': 'success',
             'chatId': 123,
-            'avatarUrl': f"/static/chat_avatars/{unique_name}"
         })
 
     except Exception as e:
