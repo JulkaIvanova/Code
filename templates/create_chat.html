@@ -19,7 +19,7 @@
         
     </head>
 <body>
-    <h1 style="text-align: center; color: white; margin-bottom: 20px; margin-top: 10px;">Создание чата</h1>
+    <h1 style="text-align: center; color: white; margin-bottom: 20px; margin-top: 10px;">{% if members %}Редактирование чата{% else %}Создание чата{% endif %}</h1>
     <div class="create-chat-container">
         <!-- Список друзей -->
         <div class="friends-list">
@@ -44,25 +44,50 @@
         <div class="chat-creation-panel">
             <div class="selected-friends">
                 <h3 style="text-align: left;">Участники чата</h3>
-                <div class="selected-friends-list"></div>
+                <div class="selected-friends-list">
+                    {% if members %}
+                    {% for i in range(members) %}
+                    <div class="selected-friend" data-friend-id="{{selected_friend_id[i]}}">
+                        <img src="{{selectedFriendAvatar[i]}}" alt="Аватар">
+                        <span>{{selectedFriendName[i]}}</span>
+                        <button onclick="document.querySelector('.selected-friends-list').removeChild(this.closest('.selected-friend'))" class="remove-friend">&times;</button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
             </div>
     
             <div style="text-align: left;" class="chat-details">
                 <h3 style="text-align: left;">Настройки чата</h3>
                 <div class="chat-avatar-upload">
                     <label for="chat-avatar">
-                        <img id="chat-avatar-preview" src="../static/img/chat.png" alt="Аватар чата">
+                        <img id="chat-avatar-preview" {% if chat_avatar %} src="{{chat_avatar}}" {% else %} src="../static/img/chat.png" {% endif %} alt="Аватар чата">
                     </label>
                     <input type="file" id="chat-avatar" class="hidden" accept="image/*" hidden>
                 </div>
                 
-                <input style="margin-top: 10px; text-align: left;" type="text" class="chat-name" placeholder="Название чата">
+                <input style="margin-top: 10px; text-align: left;" type="text" class="chat-name" placeholder="Название чата" {% if chat_name %} value="{{chat_name}}" {% endif %}>
                 <br>
-                <button style="text-align: left;" class="create-chat-button">Создать чат</button>
+                <button style="text-align: left;" class="create-chat-button">{% if members %}Изменить чат{% else %}Создать чат{% endif %}</button>
             </div>
         </div>
     </div>
     <div style="width: 100%; text-align: center; margin-top: 20px;"><a class="back-create-chat" href="/chats">Назад</a></div>
+    {% if members %}
+        <script>
+            var chatID = window.location.href
+            chatID = chatID.split("/")
+            console.log(chatID)
+            chatID = chatID[4]
+            console.log(chatID)
+            var path = `/api/chats/edit/${chatID}`
+        </script>
+    {% else %}
+        <script>
+            var chatID = NaN
+            var path = '/api/chats/create'
+        </script>
+    {% endif %}
     <script>
         // Получаем основные элементы
 const friendsList = document.querySelector('.friends-list');
@@ -79,7 +104,9 @@ friendsList.addEventListener('click', function(event) {
         const friendId = friendItem.dataset.friendId;
         const friendAvatar = friendItem.querySelector('.friend-avatar-create-chat').src;
         const friendName = friendItem.querySelector('.name-friend-create-chat').textContent;
-        
+        // function clousFriendSupport() {
+        //     selectedFriendsList.removeChild(selectedFriend);
+        // };
         // Проверяем, не добавлен ли уже друг
         if (!selectedFriendsList.querySelector(`[data-friend-id="${friendId}"]`)) {
             // Создаем элемент выбранного друга
@@ -102,6 +129,8 @@ friendsList.addEventListener('click', function(event) {
         }
     }
 });
+
+
 
 // Обработчик изменения аватара чата
 chatAvatarInput.addEventListener('change', function(event) {
@@ -132,22 +161,29 @@ async function createChat(data) {
                 type: data.avatar.type
             });
         }
-
+        console.log(path)
         // Отладочная информация
         console.log('Отправляемые данные FormData:');
         for (let [key, value] of formData.entries()) {
             console.log(key, value);
         }
 
-        const response = await fetch('/api/chats/create', {
+        console.log('====================================')
+
+        const response = await fetch(path, {
             method: 'POST',
             body: formData
             // Не устанавливаем Content-Type вручную!
         });
 
+        console.log('===');
+        console.log(response);
+
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Ошибка сервера');
+            console.log(response)
+            return
+            // const error = await response.json();
+            // throw new Error(error.message || 'Ошибка сервера');
         }
 
         const result = await response.json();

@@ -21,7 +21,7 @@
             </p>
         </div>
         
-        <button class="edit-chat-info">Редактировать</button>
+        <a style="color: white; text-decoration: none;" href="/edit_private_chat/{{chat_id}}" class="edit-chat-info">Редактировать</a>
     </div>
 
     <!-- Область сообщений -->
@@ -59,24 +59,24 @@ const messageInput = document.querySelector('.message-textarea');
 const sendMessageButton = document.querySelector('.send-message');
 
 // Обработчик кнопки редактирования
-editChatInfoButton.addEventListener('click', function() {
- // Переносим данные в форму редактирования
- const chatName = document.querySelector('.chat-name').textContent;
- const chatAvatar = document.querySelector('.chat-avatar').src;
- const participants = Array.from(document.querySelectorAll('.participant'))
- .map(participant => participant.textContent);
+// editChatInfoButton.addEventListener('click', function() {
+//  // Переносим данные в форму редактирования
+//  const chatName = document.querySelector('.chat-name').textContent;
+//  const chatAvatar = document.querySelector('.chat-avatar').src;
+//  const participants = Array.from(document.querySelectorAll('.participant'))
+//  .map(participant => participant.textContent);
  
- // Здесь нужно добавить логику передачи данных в форму
- // Например, через localStorage или event
- localStorage.setItem('chatEditData', JSON.stringify({
- name: chatName,
- avatar: chatAvatar,
- participants: participants
- }));
+//  // Здесь нужно добавить логику передачи данных в форму
+//  // Например, через localStorage или event
+//  localStorage.setItem('chatEditData', JSON.stringify({
+//  name: chatName,
+//  avatar: chatAvatar,
+//  participants: participants
+//  }));
  
- // Переходим на страницу редактирования
- window.location.href = '/edit_private_chat';
-});
+//  // Переходим на страницу редактирования
+//  window.location.href = '/edit_private_chat';
+// });
 
 // Обработчик отправки сообщения
 sendMessageButton.addEventListener('click', function() {
