@@ -546,8 +546,10 @@ import os
 from werkzeug.utils import secure_filename
 from flask import request, jsonify
 import time
+import uuid
+import re
 # Конфигурация
-UPLOAD_FOLDER = 'static/chat_avatars'
+UPLOAD_FOLDER = 'static\chat_avatars'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -556,35 +558,48 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def extract_numbers(text):
+    numbers = re.findall(r'"(\d+)"', text)
+    return ','.join(numbers)
+
 @app.route('/api/chats/create', methods=['POST'])
 def test2():
     try:
-        file = None
+        avatar_filename = None
         if 'avatar_file' in request.files:
             file = request.files['avatar_file']
-            print(file.read(100))
-            # Проверяем размер файла
-            if file.content_length > 2 * 1024 * 1024:  # 2MB
+
+            
+            if file.content_length > 2 * 1024 * 1024: 
                 return jsonify({'error': 'Файл слишком большой (макс. 2MB)'}), 400
 
-            # Проверяем расширение
+           
             if not allowed_file(file.filename):
                 return jsonify({'error': 'Недопустимый тип файла'}), 400
-            # Типо дальше сохранение но пусть это кто-нибудь сделает (ну или я но потом)
+            
 
-        # Получаем остальные данные
+            filename = secure_filename(file.filename)
+            avatar_filename = f"avatar_{str(uuid.uuid4())}_{filename}"
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], avatar_filename))
+     
         chat_name = request.form.get('chatName')
         friends = request.form.get('friends')
-        
+        print(extract_numbers(friends))
         if not chat_name or not friends:
             return jsonify({'error': 'Не хватает данных'}), 400
 
-        # Здесь должна быть ваша логика создания чата в БД
-        # ...
+        db_sess = db_session.create_session()
+        chat = PrivateChat(
+            members=extract_numbers(friends),
+            chat_name=chat_name,
+            chat_avatar=avatar_filename,
+        )
+        
+        db_sess.add(chat)
+        db_sess.commit()
         
         return jsonify({
             'status': 'success',
-            'chatId': 123,
         })
 
     except Exception as e:
