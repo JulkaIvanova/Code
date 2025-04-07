@@ -81,17 +81,26 @@ const sendMessageButton = document.querySelector('.send-message');
 // Обработчик отправки сообщения
 sendMessageButton.addEventListener('click', function() {
     const messageText = messageInput.value.trim();
- 
+    console.log(messageText)
     if (messageText) {
     // Здесь нужно добавить логику отправки сообщения на сервер
     // Например, через AJAX запрос
-        fetch('/send-message', {
+        var chatID = window.location.href
+        chatID = chatID.split("/private_chat/")
+        console.log(chatID)
+        chatID = chatID[1]
+        console.log(chatID)
+        
+        fetch('/api/send-message', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                text: messageText
+                text: messageText,
+                type: "private",
+                chatID: chatID
+                
             })
         })
         .then(response => response.json())
@@ -103,7 +112,7 @@ sendMessageButton.addEventListener('click', function() {
         <img class="message-avatar" src="/user-avatar.png" alt="Аватар">
         </div>
         <div class="message-content">
-        <p class="message-text">${data.text}</p>
+        <p class="message-text">${messageText}</p>
         <div class="message-meta">
         <span class="message-author">Вы</span>
         <span class="message-time">${data.time}</span>
@@ -130,51 +139,51 @@ sendMessageButton.click();
 });
 
 // Функция для добавления входящего сообщения
-function addIncomingMessage(messageData) {
-const newMessage = `
-<div class="message">
-<div class="message-avatar-box">
-<img class="message-avatar" src="${messageData.avatar}" alt="Аватар">
-</div>
-<div class="message-content">
-<p class="message-text">${messageData.text}</p>
-<div class="message-meta">
-<span class="message-author">${messageData.author}</span>
-<span class="message-time">${messageData.time}</span>
-</div>
-</div>
-</div>
-`;
+// function addIncomingMessage(messageData) {
+// const newMessage = `
+// <div class="message">
+// <div class="message-avatar-box">
+// <img class="message-avatar" src="${messageData.avatar}" alt="Аватар">
+// </div>
+// <div class="message-content">
+// <p class="message-text">${messageData.text}</p>
+// <div class="message-meta">
+// <span class="message-author">${messageData.author}</span>
+// <span class="message-time">${messageData.time}</span>
+// </div>
+// </div>
+// </div>
+// `;
 
-messagesContainer.querySelector('.messages-list').insertAdjacentHTML('beforeend', newMessage);
-messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
+// messagesContainer.querySelector('.messages-list').insertAdjacentHTML('beforeend', newMessage);
+// messagesContainer.scrollTop = messagesContainer.scrollHeight;
+// }
 
 // Пример реализации веб-сокетов для получения сообщений
 // (нужно настроить на сервере)
-const socket = io('/chat');
+// const socket = io('/chat');
 
-socket.on('connect', function() {
-console.log('Connected to chat socket');
-});
+// socket.on('connect', function() {
+// console.log('Connected to chat socket');
+// });
 
-socket.on('new_message', function(message) {
-addIncomingMessage(message);
-});
+// socket.on('new_message', function(message) {
+// addIncomingMessage(message);
+// });
 
 // Функция для получения истории сообщений
-function loadMessageHistory() {
-fetch('/messages/history')
-.then(response => response.json())
-.then(messages => {
-messages.forEach(message => {
-addIncomingMessage(message);
-});
-});
-}
+// function loadMessageHistory() {
+// fetch('/messages/history')
+// .then(response => response.json())
+// .then(messages => {
+// messages.forEach(message => {
+// addIncomingMessage(message);
+// });
+// });
+// }
 
 // Вызываем при загрузке страницы
-loadMessageHistory();
+// loadMessageHistory();
 
 // Дополнительные утилиты
 function formatTime(timestamp) {

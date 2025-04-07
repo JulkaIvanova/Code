@@ -656,6 +656,35 @@ def test3(id):
     # except Exception as e:
     #     print(f"\n!!! Ошибка: {str(e)}")
     #     return jsonify({'error': 'Внутренняя ошибка сервера'}), 500
+
+
+
+@app.route('/api/send-message', methods=['POST'])
+def test4():
+    try:
+        print(request)
+        data = request.get_json()
+        print(data)
+        text = data['text']
+        type = data['type']
+        chatID = data['chatID']
+        print(text, type, chatID)
+        db_sess = db_session.create_session()
+        coment = Comments(
+            chat_id=chatID,
+            text=text,
+            sender = current_user.id,
+            type=type,
+        )
+        
+        db_sess.add(coment)
+        db_sess.commit()
+        return jsonify({
+                'status': 'success',
+        })
+    except Exception as e:
+        print(f"\n!!! Ошибка: {str(e)}")
+        return jsonify({'error': 'Внутренняя ошибка сервера'}), 500
     
 #--------------TEST---------------------------
 

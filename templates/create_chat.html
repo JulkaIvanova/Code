@@ -76,9 +76,9 @@
     {% if members %}
         <script>
             var chatID = window.location.href
-            chatID = chatID.split("/")
+            chatID = chatID.split("/edit_private_chat/")
             console.log(chatID)
-            chatID = chatID[4]
+            chatID = chatID[1]
             console.log(chatID)
             var path = `/api/chats/edit/${chatID}`
         </script>
