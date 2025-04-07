@@ -662,29 +662,51 @@ def test3(id):
 @app.route('/api/send-message', methods=['POST'])
 def test4():
     try:
-        print(request)
         data = request.get_json()
-        print(data)
         text = data['text']
         type = data['type']
         chatID = data['chatID']
-        print(text, type, chatID)
+        
         db_sess = db_session.create_session()
+        
+        # Создаем и добавляем комментарий
         coment = Comments(
             chat_id=chatID,
             text=text,
-            sender = current_user.id,
+            sender=current_user.id,
             type=type,
         )
-        
         db_sess.add(coment)
-        db_sess.commit()
+        db_sess.commit()  # Фиксируем, чтобы получить ID комментария
+        
+        # Обновляем чат, добавляя ID комментария
+        chat = db_sess.query(PrivateChat).filter(PrivateChat.id == chatID).first()
+        if chat:
+            if chat.comments is None:
+                chat.comments = str(coment.id)
+            else:
+                comments_list = chat.comments.split(",")
+                comments_list.append(str(coment.id))
+                chat.comments = ",".join(comments_list)
+            
+            db_sess.commit()
+        user = db_sess.query(User).filter(User.id == current_user.id).first()
+        if user:
+            if user.comment_ids is None:
+                user.comment_ids = str(coment.id)
+            else:
+                user_comments_list = user.comment_ids.split(",")
+                user_comments_list.append(str(coment.id))
+                user.comment_ids = ",".join(user_comments_list)
+            db_sess.commit()
         return jsonify({
-                'status': 'success',
+            'status': 'success',
         })
     except Exception as e:
         print(f"\n!!! Ошибка: {str(e)}")
         return jsonify({'error': 'Внутренняя ошибка сервера'}), 500
+    finally:
+        db_sess.close()
     
 #--------------TEST---------------------------
 
