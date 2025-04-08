@@ -9,16 +9,16 @@
         
         <div class="chat-details">
             <h3 class="chat-name">{{chat_name}}</h3>
-            <p class="chat-participants">
+            <div style="overflow: auto; max-height: 500px; min-width: 240px; scrollbar-width: thin;" class="chat-participants">
                 {% for participant in chat_participants %}
                     <div class="participant">
                         <div class="message-avatar-box">
-                            <img style="min-width: 40px;" class="message-avatar" src="{{participant.avatar}}" alt="Аватар">
+                            <img style="min-width: 40px;" class="message-avatar" {% if participant.img_avatar %} src="{{participant.img_avatar}}" {% else %} src="../static/img/avatar.jpg" {% endif %} alt="Аватар">
                         </div>
                         {{participant.name}} {{participant.surname}}
                     </div>
                 {% endfor %}
-            </p>
+            </div>
         </div>
         
         <a style="color: white; text-decoration: none;" href="/edit_private_chat/{{chat_id}}" class="edit-chat-info">Редактировать</a>
@@ -30,9 +30,9 @@
             {% for message in messages %}
                 <div class="message {% if message.is_mine %}mine{% endif %}">
                     <div class="message-avatar-box">
-                        <img class="message-avatar" src="{{message.avatar}}" alt="Аватар">
+                        <img class="message-avatar" {% if message.avatar %} src="{{message.avatar}}" {% else %} src="../static/img/avatar.jpg" {% endif %} alt="Аватар">
                     </div>
-                    <div class="message-content">
+                    <div style="overflow-wrap: break-word;" class="message-content">
                         <p class="message-text">{{message.text}}</p>
                         <div class="message-meta">
                             <span class="message-author">{{message.author}}</span>
@@ -105,16 +105,15 @@ sendMessageButton.addEventListener('click', function() {
         })
         .then(response => response.json())
         .then(data => {
-        // Добавляем сообщение в список
         const newMessage = `
         <div class="message mine">
         <div class="message-avatar-box">
-        <img class="message-avatar" src="/user-avatar.png" alt="Аватар">
+        <img class="message-avatar" src="${data.avatar}" alt="Аватар">
         </div>
-        <div class="message-content">
-        <p class="message-text">${messageText}</p>
+        <div style="overflow-wrap: break-word;" class="message-content">
+        <p class="message-text">${data.messageText}</p>
         <div class="message-meta">
-        <span class="message-author">Вы</span>
+        <span class="message-author">${data.name}</span>
         <span class="message-time">${data.time}</span>
         </div>
         </div>
@@ -186,10 +185,10 @@ sendMessageButton.click();
 // loadMessageHistory();
 
 // Дополнительные утилиты
-function formatTime(timestamp) {
-const date = new Date(timestamp);
-return `${date.getHours()}:${date.getMinutes()}`;
-}
+// function formatTime(timestamp) {
+// const date = new Date(timestamp);
+// return `${date.getHours()}:${date.getMinutes()}`;
+// }
 
 // Обработчик для автофокуса на поле ввода
 window.addEventListener('load', function() {

@@ -27,14 +27,14 @@
                 <i style="margin-left: 0;" class="bi bi-search serch-img"></i><!-- 
                 --><input class="serch friends-serch" type="text" placeholder="Поиск">
             </form>
-            {% for i in range(friends) %}
-                <div class="friend-item" data-friend-id="{{friend_id[i]}}">
+            {% for i in friends %}
+                <div class="friend-item" data-friend-id="{{i.id}}">
                     <div class="avatar-and-name-friend">
                         <div class="friend-avatar-box-create-chat">
-                            <a href="/id/{{friend_id[i]}}"><img class="friend-avatar-create-chat" src="{{friend_avatar[i]}}" alt=""></a>
+                            <a href="/id/{{i.id}}"><img class="friend-avatar-create-chat" {% if i.img_avatar %} src="{{i.img_avatar}}" {% else %} src="../static/img/avatar.jpg" {% endif %} alt=""></a>
                         </div>
-                        <p style="margin-right: 10px;" class="name-friend-create-chat">{{friend_name[i]}}</p>
-                        <p class="name-friend-create-chat">{{friend_surname[i]}}</p>
+                        <p style="margin-right: 10px;" class="name-friend-create-chat">{{i.name}}</p>
+                        <p class="name-friend-create-chat">{{i.surname}}</p>
                     </div>
                 </div>
             {% endfor %}
@@ -46,10 +46,10 @@
                 <h3 style="text-align: left;">Участники чата</h3>
                 <div class="selected-friends-list">
                     {% if members %}
-                    {% for i in range(members) %}
-                    <div class="selected-friend" data-friend-id="{{selected_friend_id[i]}}">
-                        <img src="{{selectedFriendAvatar[i]}}" alt="Аватар">
-                        <span>{{selectedFriendName[i]}}</span>
+                    {% for i in members %}
+                    <div class="selected-friend" data-friend-id="{{i.id}}">
+                        <img {% if i.img_avatar %} src="{{i.img_avatar}}" {% else %} src="../static/img/avatar.jpg" {% endif %} alt="Аватар">
+                        <span>{{i.name}}</span>
                         <button onclick="document.querySelector('.selected-friends-list').removeChild(this.closest('.selected-friend'))" class="remove-friend">&times;</button>
                     </div>
                     {% endfor %}
@@ -180,12 +180,12 @@ async function createChat(data) {
         console.log(response);
 
         if (!response.ok) {
-            console.log(response)
+            console.log("bug")
             return
             // const error = await response.json();
             // throw new Error(error.message || 'Ошибка сервера');
         }
-
+        console.log("OK")
         const result = await response.json();
         console.log('Ответ сервера:', result);
         window.location.href = `/chats`;

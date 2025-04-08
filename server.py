@@ -343,14 +343,15 @@ def create_chat():
     form = SerchUserForm()
     if form.validate_on_submit() and form.serch_user_id.data:
         return redirect(f"/id/{form.serch_user_id.data}")
-    html = f.render_template(r"create_chat.html", 
-                            friends=15,
-                            friend_id = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], 
-                            friend_avatar=["../static/img/post_test_3.jpg", "../static/img/post_test_2.jpg", "../static/img/post_test_1.jpg", "../static/img/post_test_2.jpg", "../static/img/post_test_3.jpg", "../static/img/post_test_3.jpg", "../static/img/post_test_2.jpg", "../static/img/post_test_1.jpg", "../static/img/post_test_2.jpg", "../static/img/post_test_3.jpg", "../static/img/post_test_3.jpg", "../static/img/post_test_2.jpg", "../static/img/post_test_1.jpg", "../static/img/post_test_2.jpg", "../static/img/post_test_3.jpg"],
-                            friend_name=['ddddd', 'jjjjjjj', 'mmmmmm', 'lllllll', 'ppppppp', 'ddddd', 'jjjjjjj', 'mmmmmm', 'lllllll', 'ppppppp', 'ddddd', 'jjjjjjj', 'mmmmmm', 'lllllll', 'ppppppp'],
-                            friend_surname=['ddddd', 'jjjjjjj', 'mmmmmm', 'lllllll', 'ppppppp', 'ddddd', 'jjjjjjj', 'mmmmmm', 'lllllll', 'ppppppp', 'ddddd', 'jjjjjjj', 'mmmmmm', 'lllllll', 'ppppppp'],
-                            )
+    db_sess = db_session.create_session()
+    friends = []
+    print(current_user.friends_ids)
+    if current_user.friends_ids:
+        for i in str(current_user.friends_ids).split(","):
+            friends.append(db_sess.query(User).filter(User.id == int(i)).first())
+    html = f.render_template(r"create_chat.html", friends=friends)
     return html
+    
 
 
 @app.route("/edit_private_chat/<chat_id>", methods=["GET", "POST"])
@@ -360,18 +361,24 @@ def edit_chat(chat_id):
     form = SerchUserForm()
     if form.validate_on_submit() and form.serch_user_id.data:
         return redirect(f"/id/{form.serch_user_id.data}")
+    db_sess = db_session.create_session()
+    friends = []
+    print(current_user.friends_ids)
+    if current_user.friends_ids:
+        for i in str(current_user.friends_ids).split(","):
+            friends.append(db_sess.query(User).filter(User.id == int(i)).first())
+    chat = db_sess.query(PrivateChat).filter(PrivateChat.id == int(chat_id)).first()
+    members_id = str(chat.members).split(",")
+    members = []
+    for i in members_id:
+        if int(i) == current_user.id:
+            continue
+        members.append(db_sess.query(User).filter(User.id == int(i)).first())
     html = f.render_template(r"create_chat.html", 
-                            friends=15,
-                            friend_id = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], 
-                            friend_avatar=["../static/img/post_test_3.jpg", "../static/img/post_test_2.jpg", "../static/img/post_test_1.jpg", "../static/img/post_test_2.jpg", "../static/img/post_test_3.jpg", "../static/img/post_test_3.jpg", "../static/img/post_test_2.jpg", "../static/img/post_test_1.jpg", "../static/img/post_test_2.jpg", "../static/img/post_test_3.jpg", "../static/img/post_test_3.jpg", "../static/img/post_test_2.jpg", "../static/img/post_test_1.jpg", "../static/img/post_test_2.jpg", "../static/img/post_test_3.jpg"],
-                            friend_name=['ddddd', 'jjjjjjj', 'mmmmmm', 'lllllll', 'ppppppp', 'ddddd', 'jjjjjjj', 'mmmmmm', 'lllllll', 'ppppppp', 'ddddd', 'jjjjjjj', 'mmmmmm', 'lllllll', 'ppppppp'],
-                            friend_surname=['ddddd', 'jjjjjjj', 'mmmmmm', 'lllllll', 'ppppppp', 'ddddd', 'jjjjjjj', 'mmmmmm', 'lllllll', 'ppppppp', 'ddddd', 'jjjjjjj', 'mmmmmm', 'lllllll', 'ppppppp'],
-                            members = 5,
-                            selectedFriendAvatar = ["../static/img/post_test_3.jpg", "../static/img/post_test_2.jpg", "../static/img/post_test_1.jpg", "../static/img/post_test_2.jpg", "../static/img/post_test_3.jpg"],
-                            selectedFriendName = ['ddddd', 'jjjjjjj', 'mmmmmm', 'lllllll', 'ppppppp'],
-                            selected_friend_id = [1, 2, 3, 4, 5],
-                            chat_avatar = "../static/img/post_test_3.jpg",
-                            chat_name = "Durka"
+                            friends = friends,
+                            members = members,
+                            chat_avatar = chat.chat_avatar,
+                            chat_name = chat.chat_name
                             )
     return html
 
@@ -384,27 +391,45 @@ def private_chat(id):
             self.name = name
             self.surname = surname
             self.avatar = avatar
+    #--------TEST-----------------------#
 
-    class TestMessage:
+    class Message:
         def __init__(self, text, author, time, is_mine, avatar):
             self.text = text
             self.author = author
             self.time = time
             self.is_mine = is_mine
             self.avatar = avatar
-    #--------TEST-----------------------#
 
+    db_sess = db_session.create_session()
+    private_chat = db_sess.query(PrivateChat).filter(PrivateChat.id == id).first()
+    if not private_chat:
+        return f.abort(404)
     if not current_user.is_authenticated:
         return redirect("/")
     form = SerchUserForm()
     if form.validate_on_submit():
         return redirect(f"/id/{form.serch_user_id.data}")
+    members = private_chat.members.split(",")
+    if str(current_user.id) not in members:
+        return f.abort(404)
+    users = []
+    for i in members:
+        users.append(db_sess.query(User).filter(User.id == int(i)).first())
+    print(users)
+    if private_chat.comments:
+        message_id = private_chat.comments.split(",")
+        messages = []
+        for i in message_id:
+            message = db_sess.query(Comments).filter(Comments.id == int(i)).first()
+            user = db_sess.query(User).filter(User.id == message.sender).first()
+            messages.append(Message(message.text, user.name, str(message.send_date).split(".")[0], message.sender == current_user.id, user.img_avatar))
     html = f.render_template("private_chat.html",
                              chat_id = int(id),
-                            chat_avatar='../static/img/post_test_3.jpg',
-                            chat_name='Durka',
-                            chat_participants = [TestChat_participants("some", "someone", "../static/img/post_test_2.jpg"), TestChat_participants("NotJulia", "NotIvanova", "../static/img/post_test_3.jpg"), TestChat_participants("Julia", "Ivanova", "../static/img/post_test_1.jpg")],
-                            messages = [TestMessage("dfhdhfhhfhe", "Julia", "00:02", True, "../static/img/post_test_2.jpg"), TestMessage("dfhdhfhhfhe", "NotJulia", "00:02", False, "../static/img/post_test_1.jpg"), TestMessage("dfhdhfhhfhe", "Julia", "00:02", True, "../static/img/post_test_2.jpg"), TestMessage("dfhdhfhhfhehh\nhhhhhhhhhhhhhh\nhhhhhhhh hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh", "some", "00:02", False, "../static/img/post_test_3.jpg")],
+                            chat_avatar=private_chat.chat_avatar,
+                            chat_name=private_chat.chat_name,
+                            chat_participants = users,
+                            messages = messages,
                             form = form,
                             ClientId = f'/id/{current_user.id}',
                             cntRequests=2,
@@ -413,6 +438,21 @@ def private_chat(id):
                             friend_request_name=['rrrrr', 'hhhhhh'],
                             friend_request_surname=['ggggg', 'jjjjj'],
                             seeFilter = False)
+    
+    # html = f.render_template("private_chat.html",
+    #                          chat_id = int(id),
+    #                         chat_avatar='../static/img/post_test_3.jpg',
+    #                         chat_name='Durka',
+    #                         chat_participants = [TestChat_participants("some", "someone", "../static/img/post_test_2.jpg"), TestChat_participants("NotJulia", "NotIvanova", "../static/img/post_test_3.jpg"), TestChat_participants("Julia", "Ivanova", "../static/img/post_test_1.jpg")],
+    #                         messages = [Message("dfhdhfhhfhe", "Julia", "00:02", True, "../static/img/post_test_2.jpg"), Message("dfhdhfhhfhe", "NotJulia", "00:02", False, "../static/img/post_test_1.jpg"), Message("dfhdhfhhfhe", "Julia", "00:02", True, "../static/img/post_test_2.jpg"), Message("dfhdhfhhfhehh\nhhhhhhhhhhhhhh\nhhhhhhhh hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh", "some", "00:02", False, "../static/img/post_test_3.jpg")],
+    #                         form = form,
+    #                         ClientId = f'/id/{current_user.id}',
+    #                         cntRequests=2,
+    #                         friend_request_id=[2, 3],
+    #                         friend_request_avatar=['../static/img/post_test_2.jpg', '../static/img/logo.png'],
+    #                         friend_request_name=['rrrrr', 'hhhhhh'],
+    #                         friend_request_surname=['ggggg', 'jjjjj'],
+    #                         seeFilter = False)
     return html
 
 
@@ -581,7 +621,8 @@ def test2():
             filename = secure_filename(file.filename)
             avatar_filename = f"avatar_{str(uuid.uuid4())}_{filename}"
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], avatar_filename))
-     
+            avatar_filename = rf"..\{UPLOAD_FOLDER}\{avatar_filename}"
+
         chat_name = request.form.get('chatName')
         friends = request.form.get('friends')
         print(extract_numbers(friends))
@@ -590,7 +631,7 @@ def test2():
 
         db_sess = db_session.create_session()
         chat = PrivateChat(
-            members=extract_numbers(friends),
+            members=extract_numbers(friends)+f",{current_user.id}",
             chat_name=chat_name,
             chat_avatar=avatar_filename,
         )
@@ -610,54 +651,47 @@ def test2():
 @app.route('/api/chats/edit/<id>', methods=['POST'])
 def test3(id):
     try:
-        file = None
+        avatar_filename = None
         if 'avatar_file' in request.files:
             file = request.files['avatar_file']
-            print(file.read(100))
+
+            
+            if file.content_length > 2 * 1024 * 1024: 
+                return jsonify({'error': 'Файл слишком большой (макс. 2MB)'}), 400
+
+           
+            if not allowed_file(file.filename):
+                return jsonify({'error': 'Недопустимый тип файла'}), 400
+            
+
+            filename = secure_filename(file.filename)
+            avatar_filename = f"avatar_{str(uuid.uuid4())}_{filename}"
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], avatar_filename))
+            avatar_filename = rf"..\{UPLOAD_FOLDER}\{avatar_filename}"
+            print(avatar_filename)
+
         chat_name = request.form.get('chatName')
         friends = request.form.get('friends')
-        print(file, chat_name, friends)
+        # print(file, chat_name, friends)
+
+        db_sess = db_session.create_session()
+        chat = db_sess.query(PrivateChat).filter(PrivateChat.id == int(id)).first()
+        chat.members=extract_numbers(friends)+f",{current_user.id}"
+        chat.chat_name=chat_name
+        if avatar_filename:
+            chat.chat_avatar=avatar_filename
+        
+        
+        db_sess.add(chat)
+        db_sess.commit()
+
         return jsonify({
-                'status': 'success',
-                'chatId': 123,
+            'status': 'success',
         })
+    
     except Exception as e:
         print(f"\n!!! Ошибка: {str(e)}")
         return jsonify({'error': 'Внутренняя ошибка сервера'}), 500
-    # try:
-    #     file = None
-    #     if 'avatar_file' in request.files:
-    #         file = request.files['avatar_file']
-    #         print(file.read(100))
-    #         # Проверяем размер файла
-    #         if file.content_length > 2 * 1024 * 1024:  # 2MB
-    #             return jsonify({'error': 'Файл слишком большой (макс. 2MB)'}), 400
-
-    #         # Проверяем расширение
-    #         if not allowed_file(file.filename):
-    #             return jsonify({'error': 'Недопустимый тип файла'}), 400
-    #         # Типо дальше сохранение но пусть это кто-нибудь сделает (ну или я но потом)
-
-    #     # Получаем остальные данные
-    #     chat_name = request.form.get('chatName')
-    #     friends = request.form.get('friends')
-        
-    #     if not chat_name or not friends:
-    #         return jsonify({'error': 'Не хватает данных'}), 400
-
-    #     # Здесь должна быть ваша логика создания чата в БД
-    #     # ...
-        
-    #     return jsonify({
-    #         'status': 'success',
-    #         'chatId': 123,
-    #     })
-
-    # except Exception as e:
-    #     print(f"\n!!! Ошибка: {str(e)}")
-    #     return jsonify({'error': 'Внутренняя ошибка сервера'}), 500
-
-
 
 @app.route('/api/send-message', methods=['POST'])
 def test4():
@@ -699,8 +733,14 @@ def test4():
                 user_comments_list.append(str(coment.id))
                 user.comment_ids = ",".join(user_comments_list)
             db_sess.commit()
+        avatar = "../static/img/avatar.jpg"
+        if current_user.img_avatar:
+            avatar = current_user.img_avatar
         return jsonify({
-            'status': 'success',
+            'time': str(coment.send_date).split(".")[0],
+            'messageText': coment.text,
+            'name': current_user.name,
+            'avatar': avatar 
         })
     except Exception as e:
         print(f"\n!!! Ошибка: {str(e)}")

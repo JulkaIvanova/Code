@@ -797,7 +797,8 @@ header{
 .create-chat-container {
     display: flex;
     width: 100%;
-    max-width: 1200px;
+    min-width: 943.3px;
+    max-width: 950px;
     max-height: 500px;
     margin: 0 auto;
     border: 1px solid #3d3a3a;
@@ -999,7 +1000,8 @@ header{
 .chat-container {
     display: flex;
     width: 100%;
-    max-width: 1200px;
+    min-width: 943.3;
+    max-width: 950px;
     margin: 0 auto;
     background-color: #222;
     color: white;
@@ -1008,7 +1010,7 @@ header{
 }
 
 .chat-info-panel {
-    width: 25%;
+    width: 30%;
     padding: 20px;
     border-right: 1px solid #3d3a3a;
     display: flex;
@@ -1051,6 +1053,7 @@ header{
 
 .participant {
     display: flex;
+    min-width: 200px;
     flex-direction: row;
     align-items: center;
     margin-right: 5px;
@@ -1075,7 +1078,7 @@ header{
 }
 
 .messages-container {
-    width: 75%;
+    width: 70%;
     padding: 20px;
     display: flex;
     flex-direction: column;
