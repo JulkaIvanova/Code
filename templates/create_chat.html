@@ -80,11 +80,13 @@
             console.log(chatID)
             chatID = chatID[1]
             console.log(chatID)
+            var type_request = 'PUT'
             var path = `/api/chats/edit/${chatID}`
         </script>
     {% else %}
         <script>
             var chatID = NaN
+            var type_request = 'POST'
             var path = '/api/chats/create'
         </script>
     {% endif %}
@@ -171,7 +173,7 @@ async function createChat(data) {
         console.log('====================================')
 
         const response = await fetch(path, {
-            method: 'POST',
+            method: type_request,
             body: formData
             // Не устанавливаем Content-Type вручную!
         });

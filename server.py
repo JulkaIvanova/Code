@@ -21,13 +21,18 @@ from forms.create_post_form import CreatePostForm
 from forms.registr_form import *
 from forms.serch_user import SerchUserForm
 from forms.edit_post_form import EditPostForm
+from data.api import*
+from flask_restful import Api
+
+
 
 app = f.Flask(__name__)
 db_session.global_init("db/Code.db")
 app.config["SECRET_KEY"] = "code_secret_key"
 app.config["UPLOAD_FOLDER"] = os.path.join(app.root_path, "static/uploads")
 app.config["ALLOWED_EXTENSIONS"] = {"png", "jpg", "jpeg", "gif"}
-
+api = Api(app)
+init_api(api)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -362,6 +367,12 @@ def edit_chat(chat_id):
     if form.validate_on_submit() and form.serch_user_id.data:
         return redirect(f"/id/{form.serch_user_id.data}")
     db_sess = db_session.create_session()
+    private_chat = db_sess.query(PrivateChat).filter(PrivateChat.id == chat_id).first()
+    if not private_chat:
+        return f.abort(404)
+    members = private_chat.members.split(",")
+    if str(current_user.id) not in members:
+        return f.abort(404)
     friends = []
     print(current_user.friends_ids)
     if current_user.friends_ids:
@@ -374,10 +385,13 @@ def edit_chat(chat_id):
         if int(i) == current_user.id:
             continue
         members.append(db_sess.query(User).filter(User.id == int(i)).first())
+    chat_avatar = rf"..\static\img\chat.png"
+    if private_chat.chat_avatar:
+        chat_avatar = private_chat.chat_avatar
     html = f.render_template(r"create_chat.html", 
                             friends = friends,
                             members = members,
-                            chat_avatar = chat.chat_avatar,
+                            chat_avatar = chat_avatar,
                             chat_name = chat.chat_name
                             )
     return html
@@ -417,16 +431,19 @@ def private_chat(id):
     for i in members:
         users.append(db_sess.query(User).filter(User.id == int(i)).first())
     print(users)
+    messages = []
     if private_chat.comments:
         message_id = private_chat.comments.split(",")
-        messages = []
         for i in message_id:
             message = db_sess.query(Comments).filter(Comments.id == int(i)).first()
             user = db_sess.query(User).filter(User.id == message.sender).first()
             messages.append(Message(message.text, user.name, str(message.send_date).split(".")[0], message.sender == current_user.id, user.img_avatar))
+    chat_avatar = rf"..\static\img\chat.png"
+    if private_chat.chat_avatar:
+        chat_avatar = private_chat.chat_avatar
     html = f.render_template("private_chat.html",
                              chat_id = int(id),
-                            chat_avatar=private_chat.chat_avatar,
+                            chat_avatar=chat_avatar,
                             chat_name=private_chat.chat_name,
                             chat_participants = users,
                             messages = messages,
@@ -549,204 +566,204 @@ def edit_post(post_id):
 
 #!!!ВАЖНЫЙ КОМЕНТ: все с блоки с пометкой TEST написаны лишь для проверки и не являются полноценными, однако могут помочь в разработке в дальнейшем
 #--------------TEST---------------------------
-from flask import request, jsonify
+# from flask import request, jsonify
 
-@app.route('/api/like', methods=['POST'])
-def test1():
-    try:
-        data = request.get_json()
+# @app.route('/api/like', methods=['POST'])
+# def test1():
+#     try:
+#         data = request.get_json()
         
-        # Проверяем наличие всех необходимых полей
-        required_fields = ['postId', 'userId', 'likesCount']
-        if not all(field in data for field in required_fields):
-            return jsonify({'error': 'Missing required fields'}), 400
+#         # Проверяем наличие всех необходимых полей
+#         required_fields = ['postId', 'userId', 'likesCount']
+#         if not all(field in data for field in required_fields):
+#             return jsonify({'error': 'Missing required fields'}), 400
 
-        # Получаем данные
-        post_id = data['postId']
-        user_id = data['userId']
-        likes_count = data['likesCount']
+#         # Получаем данные
+#         post_id = data['postId']
+#         user_id = data['userId']
+#         likes_count = data['likesCount']
 
-        # Здесь вы можете обработать данные (сохранить в БД и т.д.)
-        print(f"Получен лайк: Пост {post_id}, Пользователь {user_id}, Лайков: {likes_count}")
+#         # Здесь вы можете обработать данные (сохранить в БД и т.д.)
+#         print(f"Получен лайк: Пост {post_id}, Пользователь {user_id}, Лайков: {likes_count}")
 
-        # Возвращаем успешный ответ
-        return jsonify({
-            'status': 'success',
-            'message': 'Like processed',
-            'postId': post_id,
-            'newLikesCount': likes_count
-        }), 200
+#         # Возвращаем успешный ответ
+#         return jsonify({
+#             'status': 'success',
+#             'message': 'Like processed',
+#             'postId': post_id,
+#             'newLikesCount': likes_count
+#         }), 200
 
-    except Exception as e:
-        print(f"Ошибка при обработке лайка: {str(e)}")
-        return jsonify({'error': 'Internal server error'}), 500
+#     except Exception as e:
+#         print(f"Ошибка при обработке лайка: {str(e)}")
+#         return jsonify({'error': 'Internal server error'}), 500
 
-#ВНИМАНИЕ!!!: данная функция пока работает некоректно (однако моей задачей в данный момент было имено отправить данные) картинка отправляется, чтобы её прочитать используйте read()
-import os
-from werkzeug.utils import secure_filename
-from flask import request, jsonify
-import time
-import uuid
-import re
-# Конфигурация
-UPLOAD_FOLDER = 'static\chat_avatars'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+# #ВНИМАНИЕ!!!: данная функция пока работает некоректно (однако моей задачей в данный момент было имено отправить данные) картинка отправляется, чтобы её прочитать используйте read()
+# import os
+# from werkzeug.utils import secure_filename
+# from flask import request, jsonify
+# import time
+# import uuid
+# import re
+# # Конфигурация
+# UPLOAD_FOLDER = 'static\chat_avatars'
+# ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+# app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+# def allowed_file(filename):
+#     return '.' in filename and \
+#            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def extract_numbers(text):
-    numbers = re.findall(r'"(\d+)"', text)
-    return ','.join(numbers)
+# def extract_numbers(text):
+#     numbers = re.findall(r'"(\d+)"', text)
+#     return ','.join(numbers)
 
-@app.route('/api/chats/create', methods=['POST'])
-def test2():
-    try:
-        avatar_filename = None
-        if 'avatar_file' in request.files:
-            file = request.files['avatar_file']
+# @app.route('/api/chats/create', methods=['POST'])
+# def test2():
+#     try:
+#         avatar_filename = None
+#         if 'avatar_file' in request.files:
+#             file = request.files['avatar_file']
 
             
-            if file.content_length > 2 * 1024 * 1024: 
-                return jsonify({'error': 'Файл слишком большой (макс. 2MB)'}), 400
+#             if file.content_length > 2 * 1024 * 1024: 
+#                 return jsonify({'error': 'Файл слишком большой (макс. 2MB)'}), 400
 
            
-            if not allowed_file(file.filename):
-                return jsonify({'error': 'Недопустимый тип файла'}), 400
+#             if not allowed_file(file.filename):
+#                 return jsonify({'error': 'Недопустимый тип файла'}), 400
             
 
-            filename = secure_filename(file.filename)
-            avatar_filename = f"avatar_{str(uuid.uuid4())}_{filename}"
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], avatar_filename))
-            avatar_filename = rf"..\{UPLOAD_FOLDER}\{avatar_filename}"
+#             filename = secure_filename(file.filename)
+#             avatar_filename = f"avatar_{str(uuid.uuid4())}_{filename}"
+#             file.save(os.path.join(app.config['UPLOAD_FOLDER'], avatar_filename))
+#             avatar_filename = rf"..\{UPLOAD_FOLDER}\{avatar_filename}"
 
-        chat_name = request.form.get('chatName')
-        friends = request.form.get('friends')
-        print(extract_numbers(friends))
-        if not chat_name or not friends:
-            return jsonify({'error': 'Не хватает данных'}), 400
+#         chat_name = request.form.get('chatName')
+#         friends = request.form.get('friends')
+#         print(extract_numbers(friends))
+#         if not chat_name or not friends:
+#             return jsonify({'error': 'Не хватает данных'}), 400
 
-        db_sess = db_session.create_session()
-        chat = PrivateChat(
-            members=extract_numbers(friends)+f",{current_user.id}",
-            chat_name=chat_name,
-            chat_avatar=avatar_filename,
-        )
+#         db_sess = db_session.create_session()
+#         chat = PrivateChat(
+#             members=extract_numbers(friends)+f",{current_user.id}",
+#             chat_name=chat_name,
+#             chat_avatar=avatar_filename,
+#         )
         
-        db_sess.add(chat)
-        db_sess.commit()
+#         db_sess.add(chat)
+#         db_sess.commit()
         
-        return jsonify({
-            'status': 'success',
-        })
+#         return jsonify({
+#             'status': 'success',
+#         })
 
-    except Exception as e:
-        print(f"\n!!! Ошибка: {str(e)}")
-        return jsonify({'error': 'Внутренняя ошибка сервера'}), 500
+#     except Exception as e:
+#         print(f"\n!!! Ошибка: {str(e)}")
+#         return jsonify({'error': 'Внутренняя ошибка сервера'}), 500
     
 
-@app.route('/api/chats/edit/<id>', methods=['POST'])
-def test3(id):
-    try:
-        avatar_filename = None
-        if 'avatar_file' in request.files:
-            file = request.files['avatar_file']
+# @app.route('/api/chats/edit/<id>', methods=['POST'])
+# def test3(id):
+#     try:
+#         avatar_filename = None
+#         if 'avatar_file' in request.files:
+#             file = request.files['avatar_file']
 
             
-            if file.content_length > 2 * 1024 * 1024: 
-                return jsonify({'error': 'Файл слишком большой (макс. 2MB)'}), 400
+#             if file.content_length > 2 * 1024 * 1024: 
+#                 return jsonify({'error': 'Файл слишком большой (макс. 2MB)'}), 400
 
            
-            if not allowed_file(file.filename):
-                return jsonify({'error': 'Недопустимый тип файла'}), 400
+#             if not allowed_file(file.filename):
+#                 return jsonify({'error': 'Недопустимый тип файла'}), 400
             
 
-            filename = secure_filename(file.filename)
-            avatar_filename = f"avatar_{str(uuid.uuid4())}_{filename}"
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], avatar_filename))
-            avatar_filename = rf"..\{UPLOAD_FOLDER}\{avatar_filename}"
-            print(avatar_filename)
+#             filename = secure_filename(file.filename)
+#             avatar_filename = f"avatar_{str(uuid.uuid4())}_{filename}"
+#             file.save(os.path.join(app.config['UPLOAD_FOLDER'], avatar_filename))
+#             avatar_filename = rf"..\{UPLOAD_FOLDER}\{avatar_filename}"
+#             print(avatar_filename)
 
-        chat_name = request.form.get('chatName')
-        friends = request.form.get('friends')
-        # print(file, chat_name, friends)
+#         chat_name = request.form.get('chatName')
+#         friends = request.form.get('friends')
+#         # print(file, chat_name, friends)
 
-        db_sess = db_session.create_session()
-        chat = db_sess.query(PrivateChat).filter(PrivateChat.id == int(id)).first()
-        chat.members=extract_numbers(friends)+f",{current_user.id}"
-        chat.chat_name=chat_name
-        if avatar_filename:
-            chat.chat_avatar=avatar_filename
+#         db_sess = db_session.create_session()
+#         chat = db_sess.query(PrivateChat).filter(PrivateChat.id == int(id)).first()
+#         chat.members=extract_numbers(friends)+f",{current_user.id}"
+#         chat.chat_name=chat_name
+#         if avatar_filename:
+#             chat.chat_avatar=avatar_filename
         
         
-        db_sess.add(chat)
-        db_sess.commit()
+#         db_sess.add(chat)
+#         db_sess.commit()
 
-        return jsonify({
-            'status': 'success',
-        })
+#         return jsonify({
+#             'status': 'success',
+#         })
     
-    except Exception as e:
-        print(f"\n!!! Ошибка: {str(e)}")
-        return jsonify({'error': 'Внутренняя ошибка сервера'}), 500
+#     except Exception as e:
+#         print(f"\n!!! Ошибка: {str(e)}")
+#         return jsonify({'error': 'Внутренняя ошибка сервера'}), 500
 
-@app.route('/api/send-message', methods=['POST'])
-def test4():
-    try:
-        data = request.get_json()
-        text = data['text']
-        type = data['type']
-        chatID = data['chatID']
+# @app.route('/api/send-message', methods=['POST'])
+# def test4():
+#     try:
+#         data = request.get_json()
+#         text = data['text']
+#         type = data['type']
+#         chatID = data['chatID']
         
-        db_sess = db_session.create_session()
+#         db_sess = db_session.create_session()
         
-        # Создаем и добавляем комментарий
-        coment = Comments(
-            chat_id=chatID,
-            text=text,
-            sender=current_user.id,
-            type=type,
-        )
-        db_sess.add(coment)
-        db_sess.commit()  # Фиксируем, чтобы получить ID комментария
+#         # Создаем и добавляем комментарий
+#         coment = Comments(
+#             chat_id=chatID,
+#             text=text,
+#             sender=current_user.id,
+#             type=type,
+#         )
+#         db_sess.add(coment)
+#         db_sess.commit()  # Фиксируем, чтобы получить ID комментария
         
-        # Обновляем чат, добавляя ID комментария
-        chat = db_sess.query(PrivateChat).filter(PrivateChat.id == chatID).first()
-        if chat:
-            if chat.comments is None:
-                chat.comments = str(coment.id)
-            else:
-                comments_list = chat.comments.split(",")
-                comments_list.append(str(coment.id))
-                chat.comments = ",".join(comments_list)
+#         # Обновляем чат, добавляя ID комментария
+#         chat = db_sess.query(PrivateChat).filter(PrivateChat.id == chatID).first()
+#         if chat:
+#             if chat.comments is None:
+#                 chat.comments = str(coment.id)
+#             else:
+#                 comments_list = chat.comments.split(",")
+#                 comments_list.append(str(coment.id))
+#                 chat.comments = ",".join(comments_list)
             
-            db_sess.commit()
-        user = db_sess.query(User).filter(User.id == current_user.id).first()
-        if user:
-            if user.comment_ids is None:
-                user.comment_ids = str(coment.id)
-            else:
-                user_comments_list = user.comment_ids.split(",")
-                user_comments_list.append(str(coment.id))
-                user.comment_ids = ",".join(user_comments_list)
-            db_sess.commit()
-        avatar = "../static/img/avatar.jpg"
-        if current_user.img_avatar:
-            avatar = current_user.img_avatar
-        return jsonify({
-            'time': str(coment.send_date).split(".")[0],
-            'messageText': coment.text,
-            'name': current_user.name,
-            'avatar': avatar 
-        })
-    except Exception as e:
-        print(f"\n!!! Ошибка: {str(e)}")
-        return jsonify({'error': 'Внутренняя ошибка сервера'}), 500
-    finally:
-        db_sess.close()
+#             db_sess.commit()
+#         user = db_sess.query(User).filter(User.id == current_user.id).first()
+#         if user:
+#             if user.comment_ids is None:
+#                 user.comment_ids = str(coment.id)
+#             else:
+#                 user_comments_list = user.comment_ids.split(",")
+#                 user_comments_list.append(str(coment.id))
+#                 user.comment_ids = ",".join(user_comments_list)
+#             db_sess.commit()
+#         avatar = "../static/img/avatar.jpg"
+#         if current_user.img_avatar:
+#             avatar = current_user.img_avatar
+#         return jsonify({
+#             'time': str(coment.send_date).split(".")[0],
+#             'messageText': coment.text,
+#             'name': current_user.name,
+#             'avatar': avatar 
+#         })
+#     except Exception as e:
+#         print(f"\n!!! Ошибка: {str(e)}")
+#         return jsonify({'error': 'Внутренняя ошибка сервера'}), 500
+#     finally:
+#         db_sess.close()
     
 #--------------TEST---------------------------
 

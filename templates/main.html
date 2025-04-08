@@ -39,67 +39,131 @@
                     </div>
                 </div>
                 {% block posts %}{% endblock %}
-        <script>
-            let contaner = document.getElementsByClassName('likes');
-            let flags = []
-            if (contaner.length) {
-                for (let i=0; i<contaner.length; i++ ){
-                    let con = contaner[i];
-                    let buttonLikes = con.querySelector('i');
-                    buttonLikes.addEventListener("click", cntLikesUp);
-                    if (con.dataset.bool == '1') flags.push(true);
-                    else flags.push(false);
-                }
-            }
-            function cntLikesUp() {
-                let likeContaner = this.parentElement;
-                if (flags[+(likeContaner.id)]) return;
-                let cntLikes = likeContaner.querySelector('span').innerText;
-                this.className = "bi bi-heart-fill";
-                cntLikes = +cntLikes + 1;
-                likeContaner.querySelector('span').innerText = cntLikes;
-                flags[+(likeContaner.id)] = true
-            }
-            let createPostButton = document.getElementById('createPost');
-            createPostButton.addEventListener("click", function(){
-                let block = document.getElementById('contaner');
-                let body = document.querySelector('body');
-                body.style.overflow = 'hidden';
-                block.style.display = 'block'
-                let backgroundDiv = document.getElementById('wrapper');
-                backgroundDiv.addEventListener("click", function(){
-                    body.style.overflow = 'auto';
-                    block.style.display = 'none';
-                });
-            });
-            let addPanel = document.getElementsByClassName('more');
-            if (addPanel.length){
-                for (let i = 0; i < addPanel.length; i++){
-                    addPanel[i].getElementByClassName;
-                    addPanel[i].addEventListener("click", addPanelSee);
-
-                };
-            };
-            function addPanelSee(){
-                let supportContaner = this.parentElement;
-                supportContaner = supportContaner.parentElement;
-                supportContaner = supportContaner.parentElement;
-                let panel = supportContaner.querySelector('.edit-del');
-                let panels = document.getElementsByClassName('edit-del');
-                for (let i = 0; i < panels.length; i++){
-                    if (panels[i] != panel){
-                        panels[i].hidden = true;
+                <script>
+                    let contaner = document.getElementsByClassName('likes');
+                    let flags = []
+                    if (contaner.length) {
+                        for (let i=0; i<contaner.length; i++ ){
+                            let con = contaner[i];
+                            let buttonLikes = con.querySelector('i');
+                            buttonLikes.addEventListener("click", cntLikesUp);
+                            if (con.dataset.bool == '1') flags.push(true);
+                            else flags.push(false);
+                        }
                     }
-                }
-                panel.hidden = false;
-            };
-            document.onclick = function(){
-                let panels = document.getElementsByClassName('edit-del');
-                for (let i = 0; i < panels.length; i++){
-                    if (panels[i].hidden == false){
-                        panels[i].hidden = true;
+                    async function sendLikeToServer(postId, userId, likesCount) {
+                        try {
+                            const response = await fetch('/api/like', {
+                                method: 'POST',
+                                credentials: 'include',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    postId: postId,
+                                    userId: userId,
+                                    likesCount: likesCount
+                                })
+                            });
+        
+                            if (!response.ok) {
+                                throw new Error('Ошибка при отправке лайка');
+                            }
+        
+                            const result = await response.json();
+                            console.log('Лайк сохранен:', result);
+                        } catch (error) {
+                            console.error('Ошибка:', error);
+                        }
+                    }
+        
+                    // function cntLikesUp() {
+                    //     let likeContaner = this.parentElement;
+                    //     if (flags[+(likeContaner.id)]) return;
+                    //     let cntLikes = likeContaner.querySelector('span').innerText;
+                    //     this.className = "bi bi-heart-fill";
+                    //     cntLikes = +cntLikes + 1;
+                    //     likeContaner.querySelector('span').innerText = cntLikes;
+                    //     let support = likeContaner.parentElement
+                    //     support = support.parentElement
+                    //     support = support.parentElement
+                    //     let currentPost = support.querySelector(".carousel")
+                    //     console.log(currentPost.id)
+                    //     console.log(support)
+                    //     let a = document.querySelector("#avatar-img-heder-linck").href
+                    //     console.log(a.split("id/")[1])
+                    //     flags[+(likeContaner.id)] = true;
+        
+                    //     let currentPostId = currentPost.id
+                    //     let currentUserId = a.split("id/")[1]
+        
+                    // }
+                    function cntLikesUp() {
+                        let likeContaner = this.parentElement;
+                        if (flags[+(likeContaner.id)]) return;
+                        
+                        let cntLikes = likeContaner.querySelector('span').innerText;
+                        this.className = "bi bi-heart-fill";
+                        cntLikes = +cntLikes + 1;
+                        likeContaner.querySelector('span').innerText = cntLikes;
+                        
+                        let support = likeContaner.parentElement;
+                        support = support.parentElement;
+                        support = support.parentElement;
+                        let currentPost = support.querySelector(".carousel");
+                        
+                        let a = document.querySelector("#avatar-img-heder-linck").href;
+                        flags[+(likeContaner.id)] = true;
+        
+                        let currentPostId = currentPost.id;
+                        let currentUserId = a.split("id/")[1];
+        
+                        // Вызываем функцию отправки на сервер
+                        sendLikeToServer(currentPostId, currentUserId, cntLikes);
+                    }
+                    let createPostButton = document.getElementById('createPost');
+                    createPostButton.addEventListener("click", function(){
+                        let block = document.getElementById('contaner');
+                        let body = document.querySelector('body');
+                        body.style.overflow = 'hidden';
+                        block.style.display = 'block'
+                        let backgroundDiv = document.getElementById('wrapper');
+                        backgroundDiv.addEventListener("click", function(){
+                            body.style.overflow = 'auto';
+                            block.style.display = 'none';
+                        });
+                        //setTimeout(()=>{
+                        //    
+                        //}, 0);
+                    });
+                    let addPanel = document.getElementsByClassName('more');
+                    if (addPanel.length){
+                        for (let i = 0; i < addPanel.length; i++){
+                            addPanel[i].getElementByClassName;
+                            addPanel[i].addEventListener("click", addPanelSee);
+        
+                        };
                     };
-                };
-            };
-        </script>
+                    function addPanelSee(){
+                        let supportContaner = this.parentElement;
+                        supportContaner = supportContaner.parentElement;
+                        supportContaner = supportContaner.parentElement;
+                        let panel = supportContaner.querySelector('.edit-del');
+                        let panels = document.getElementsByClassName('edit-del');
+                        for (let i = 0; i < panels.length; i++){
+                            if (panels[i] != panel){
+                                panels[i].hidden = true;
+                            }
+                        }
+                        panel.hidden = false;
+                    };
+                    document.onclick = function(){
+                        let panels = document.getElementsByClassName('edit-del');
+                        for (let i = 0; i < panels.length; i++){
+                            if (panels[i].hidden == false){
+                                panels[i].hidden = true;
+                            };
+                        };
+                    };
+                </script>
 {% endblock %}

@@ -51,14 +51,75 @@
                             else flags.push(false);
                         }
                     }
+                    async function sendLikeToServer(postId, userId, likesCount) {
+                        try {
+                            const response = await fetch('/api/like', {
+                                method: 'POST',
+                                credentials: 'include',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    postId: postId,
+                                    userId: userId,
+                                    likesCount: likesCount
+                                })
+                            });
+        
+                            if (!response.ok) {
+                                throw new Error('Ошибка при отправке лайка');
+                            }
+        
+                            const result = await response.json();
+                            console.log('Лайк сохранен:', result);
+                        } catch (error) {
+                            console.error('Ошибка:', error);
+                        }
+                    }
+        
+                    // function cntLikesUp() {
+                    //     let likeContaner = this.parentElement;
+                    //     if (flags[+(likeContaner.id)]) return;
+                    //     let cntLikes = likeContaner.querySelector('span').innerText;
+                    //     this.className = "bi bi-heart-fill";
+                    //     cntLikes = +cntLikes + 1;
+                    //     likeContaner.querySelector('span').innerText = cntLikes;
+                    //     let support = likeContaner.parentElement
+                    //     support = support.parentElement
+                    //     support = support.parentElement
+                    //     let currentPost = support.querySelector(".carousel")
+                    //     console.log(currentPost.id)
+                    //     console.log(support)
+                    //     let a = document.querySelector("#avatar-img-heder-linck").href
+                    //     console.log(a.split("id/")[1])
+                    //     flags[+(likeContaner.id)] = true;
+        
+                    //     let currentPostId = currentPost.id
+                    //     let currentUserId = a.split("id/")[1]
+        
+                    // }
                     function cntLikesUp() {
                         let likeContaner = this.parentElement;
                         if (flags[+(likeContaner.id)]) return;
+                        
                         let cntLikes = likeContaner.querySelector('span').innerText;
                         this.className = "bi bi-heart-fill";
                         cntLikes = +cntLikes + 1;
                         likeContaner.querySelector('span').innerText = cntLikes;
-                        flags[+(likeContaner.id)] = true
+                        
+                        let support = likeContaner.parentElement;
+                        support = support.parentElement;
+                        support = support.parentElement;
+                        let currentPost = support.querySelector(".carousel");
+                        
+                        let a = document.querySelector("#avatar-img-heder-linck").href;
+                        flags[+(likeContaner.id)] = true;
+        
+                        let currentPostId = currentPost.id;
+                        let currentUserId = a.split("id/")[1];
+        
+                        // Вызываем функцию отправки на сервер
+                        sendLikeToServer(currentPostId, currentUserId, cntLikes);
                     }
                     let createPostButton = document.getElementById('createPost');
                     createPostButton.addEventListener("click", function(){
@@ -71,9 +132,11 @@
                             body.style.overflow = 'auto';
                             block.style.display = 'none';
                         });
+                        //setTimeout(()=>{
+                        //    
+                        //}, 0);
                     });
                     let addPanel = document.getElementsByClassName('more');
-                    console.log(addPanel)
                     if (addPanel.length){
                         for (let i = 0; i < addPanel.length; i++){
                             addPanel[i].getElementByClassName;
@@ -83,15 +146,10 @@
                     };
                     function addPanelSee(){
                         let supportContaner = this.parentElement;
-                        console.log(supportContaner)
                         supportContaner = supportContaner.parentElement;
-                        console.log(supportContaner)
                         supportContaner = supportContaner.parentElement;
-                        console.log(supportContaner)
                         let panel = supportContaner.querySelector('.edit-del');
-                        console.log(panel)
                         let panels = document.getElementsByClassName('edit-del');
-                        console.log(panels)
                         for (let i = 0; i < panels.length; i++){
                             if (panels[i] != panel){
                                 panels[i].hidden = true;
