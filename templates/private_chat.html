@@ -1,5 +1,6 @@
 {% extends "base.html" %}
-{% block content %} 
+{% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script> 
 <div class="chat-container">
     <!-- Боковая панель с информацией о чате -->
     <div class="chat-info-panel">
@@ -51,46 +52,51 @@
     </div>
 </div>
 <script>
-    // Получаем основные элементы
+// Получаем основные элементы
 const chatInfoPanel = document.querySelector('.chat-info-panel');
 const editChatInfoButton = document.querySelector('.edit-chat-info');
 const messagesContainer = document.querySelector('.messages-container');
 const messageInput = document.querySelector('.message-textarea');
 const sendMessageButton = document.querySelector('.send-message');
 
-// Обработчик кнопки редактирования
-// editChatInfoButton.addEventListener('click', function() {
-//  // Переносим данные в форму редактирования
-//  const chatName = document.querySelector('.chat-name').textContent;
-//  const chatAvatar = document.querySelector('.chat-avatar').src;
-//  const participants = Array.from(document.querySelectorAll('.participant'))
-//  .map(participant => participant.textContent);
- 
-//  // Здесь нужно добавить логику передачи данных в форму
-//  // Например, через localStorage или event
-//  localStorage.setItem('chatEditData', JSON.stringify({
-//  name: chatName,
-//  avatar: chatAvatar,
-//  participants: participants
-//  }));
- 
-//  // Переходим на страницу редактирования
-//  window.location.href = '/edit_private_chat';
-// });
+// Подключаемся к серверу WebSocket
+document.querySelector('.messages-list').scrollTo(0, document.querySelector('.messages-list').scrollHeight)
+const socket = io.connect('http://' + document.domain + ':' + location.port);
+
+const chatID = window.location.pathname.split('/private_chat/')[1];
+socket.emit('join_chat', { chat_id: chatID });
+
+// Получаем сообщения от сервера
+socket.on('message_from_server', function(data) {
+    console.log(data);
+    const messages = document.querySelector('.messages-list');
+    let a = document.querySelector("#avatar-img-heder-linck").href;
+    let currentUserId = a.split("id/")[1];
+    if (data.id != currentUserId){
+    messages.innerHTML += `
+        <div class="message">
+        <div class="message-avatar-box">
+        <img class="message-avatar" src="${data.avatar}" alt="Аватар">
+        </div>
+        <div style="overflow-wrap: break-word;" class="message-content">
+        <p class="message-text">${data.text}</p>
+        <div class="message-meta">
+        <span class="message-author">${data.author}</span>
+        <span class="message-time">${data.time}</span>
+        </div>
+        </div>
+        </div>
+        `;
+    }
+    messages.scrollTo(0, messages.scrollHeight)
+});
 
 // Обработчик отправки сообщения
 sendMessageButton.addEventListener('click', function() {
     const messageText = messageInput.value.trim();
     console.log(messageText)
     if (messageText) {
-    // Здесь нужно добавить логику отправки сообщения на сервер
-    // Например, через AJAX запрос
-        var chatID = window.location.href
-        chatID = chatID.split("/private_chat/")
-        console.log(chatID)
-        chatID = chatID[1]
-        console.log(chatID)
-        
+        socket.emit('message_from_client', {text: messageText, chat_id: chatID})
         fetch('/api/send-message', {
             method: 'POST',
             headers: {
@@ -124,9 +130,10 @@ sendMessageButton.addEventListener('click', function() {
         messagesContainer.querySelector('.messages-list').insertAdjacentHTML('beforeend', newMessage);
 
         // Прокручиваем до последнего сообщения
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        document.querySelector('.messages-list').scrollTo(0, document.querySelector('.messages-list').scrollHeight)
 
         messageInput.value = ''; // Очищаем поле ввода
+        messageInput.focus();
         });
     }
 });
@@ -136,59 +143,6 @@ if (event.key === 'Enter') {
 sendMessageButton.click();
 }
 });
-
-// Функция для добавления входящего сообщения
-// function addIncomingMessage(messageData) {
-// const newMessage = `
-// <div class="message">
-// <div class="message-avatar-box">
-// <img class="message-avatar" src="${messageData.avatar}" alt="Аватар">
-// </div>
-// <div class="message-content">
-// <p class="message-text">${messageData.text}</p>
-// <div class="message-meta">
-// <span class="message-author">${messageData.author}</span>
-// <span class="message-time">${messageData.time}</span>
-// </div>
-// </div>
-// </div>
-// `;
-
-// messagesContainer.querySelector('.messages-list').insertAdjacentHTML('beforeend', newMessage);
-// messagesContainer.scrollTop = messagesContainer.scrollHeight;
-// }
-
-// Пример реализации веб-сокетов для получения сообщений
-// (нужно настроить на сервере)
-// const socket = io('/chat');
-
-// socket.on('connect', function() {
-// console.log('Connected to chat socket');
-// });
-
-// socket.on('new_message', function(message) {
-// addIncomingMessage(message);
-// });
-
-// Функция для получения истории сообщений
-// function loadMessageHistory() {
-// fetch('/messages/history')
-// .then(response => response.json())
-// .then(messages => {
-// messages.forEach(message => {
-// addIncomingMessage(message);
-// });
-// });
-// }
-
-// Вызываем при загрузке страницы
-// loadMessageHistory();
-
-// Дополнительные утилиты
-// function formatTime(timestamp) {
-// const date = new Date(timestamp);
-// return `${date.getHours()}:${date.getMinutes()}`;
-// }
 
 // Обработчик для автофокуса на поле ввода
 window.addEventListener('load', function() {
