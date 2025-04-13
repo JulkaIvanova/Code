@@ -13,23 +13,46 @@
                     </a>
                 </div>
                 <div class="friends-div">
-                    {% for i in range(chats) %}
+                    {% for i in chats %}
+                        {% if i.comments %}
                         <div class="friend-info">
                             <div class="avatar-and-name-friend">
                                 <div style="border-radius: 20%;" class="friend-avatar-box">
-                                    <img style="border-radius: 20%;" class="friend-avatar" src="{{chat_avatar[i]}}" alt="">
+                                    <img style="border-radius: 20%;" class="friend-avatar" {% if i.chat_avatar %} src="{{i.chat_avatar}}" {% else %} src="..\static\img\chat.png" {% endif %} alt="">
                                 </div>
-                                <p class="name-friend">{{chat_name[i]}}</p>
+                                <p style="max-width: 525px;" class="name-friend">{{i.chat_name}}</p>
                             </div>
                             <div class="block-with-buttons-actFriend">
-                                {% if is_block[i] == False %}
-                                    <a href="/private_chat/{{chat_id[i]}}"><div data-tooltip="Написать" class="button-act-with-friend"><i class="bi bi-chat"></i></div></a>
+                                <a href="/private_chat/{{i.id}}"><div data-tooltip="Написать" class="button-act-with-friend"><i class="bi bi-chat"></i></div></a>
+                                {% if not i.private_chat_with_friend %}
+                                <a id="del-link" data-chat_id="{{i.id}}"><div data-tooltip="Удалить чат" class="button-act-with-friend trash-friend-button"><i class="bi bi-trash3"></i></div></a>
                                 {% endif %}
-                                <a href="/delete_private_chat/{{chat_id[i]}}"><div data-tooltip="Удалить чат" class="button-act-with-friend trash-friend-button"><i class="bi bi-trash3"></i></div></a>
                             </div>
                         </div>
+                        {% endif %}
                     {% endfor %}
                 </div>
+                <script>
+                    let buttons = document.querySelectorAll('#del-link')
+                    console.log(buttons)
+                    for (let i=0; i < buttons.length; i++){
+                        console.log(buttons[i])
+                        buttons[i].addEventListener('click', async (e) => {
+                        // e.preventDefault();
+                        try {
+                            const chat_id = e.currentTarget.dataset.chat_id
+                            const response = await fetch(`/delete_private_chat/${chat_id}`, { 
+                            method: 'DELETE',
+                            });
+                            // Обработка ответа
+                        } catch (error) {
+                            console.error('Ошибка:', error);
+                        }
+                        location.reload()
+                        });
+                    }
+                    
+                </script>
                 <script>
                     const searchInput = document.querySelector(".friends-serch");
 

@@ -9,9 +9,10 @@ class PrivateChat(SqlAlchemyBase, SerializerMixin):
     __tablename__ = "private_chats"
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
-    messeges = sqlalchemy.Column(sqlalchemy.String)
+    # messeges = sqlalchemy.Column(sqlalchemy.String)
     members = sqlalchemy.Column(sqlalchemy.String)
     chat_name = sqlalchemy.Column(sqlalchemy.String)
     chat_avatar = sqlalchemy.Column(sqlalchemy.String)
     comments = sqlalchemy.Column(sqlalchemy.String)
     modified_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
+    private_chat_with_friend = sqlalchemy.Column(sqlalchemy.Boolean, default=False)

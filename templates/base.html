@@ -38,29 +38,71 @@
                     }
                 </script> -->
                 <div style="display: inline-block; position: relative;">
-                    {% if  cntRequests > 0 %}
+                    {% if  friends_from_request %}
                         <img style="position: absolute; top:3px; left: 14px; width: 8px;" src="../static/img/notice.png">
                     {% endif %}
                     <i onclick="event.stopPropagation()" class="bi bi-bell bell-style"></i>   
                     <div class="friends-request-div" hidden>
-                        {% if cntRequests == 0 %}
+                        {% if not friends_from_request %}
                             <p style="color: white; text-align: center; margin-bottom: 0">Пусто</p>
                         {% else %}
-                            {% for i in range(cntRequests) %}
+                            {% for i in friends_from_request %}
                                 <div class="friend-request-info">
                                     <div class="avatar-and-name-friend">
                                         <div class="friend-request-avatar-box">
-                                            <a href="/id/{{friend_request_id[i]}}"><img class="friend-request-avatar" src="{{friend_request_avatar[i]}}" alt=""></a>
+                                            <a href="/id/{{i.id}}"><img class="friend-request-avatar" {% if i.img_avatar %} src="{{i.img_avatar}}" {% else %} src="../static/img/avatar.jpg" {% endif %} alt=""></a>
                                         </div>
-                                        <p class="name-request-friend">{{friend_request_name[i]}}</p><p class="name-request-friend">{{friend_request_surname[i]}}</p>
+                                        <p class="name-request-friend">{{i.name}}</p><p class="name-request-friend">{{i.surname}}</p>
                                     </div>
                                     <div class="block-with-buttons-actFriend">
-                                        <a href="/accept_request/{{friend_request_id[i]}}"><div data-tooltipRequest="Принять" class="button-act-with-friend"><i style="color: green;" class="bi bi-person-check-fill"></i></div></a>
-                                        <a href="/reject_request/{{friend_request_id[i]}}"><div data-tooltipRequest="Отклонить" class="button-act-with-friend trash-friend-button"><i class="bi bi-person-x-fill"></i></div></a>
+                                        <a data-req_id="{{i.id}}" id="put-request"><div data-tooltipRequest="Принять" class="button-act-with-friend"><i style="color: green;" class="bi bi-person-check-fill"></i></div></a>
+                                        <a data-req_id="{{i.id}}" id="del-request"><div data-tooltipRequest="Отклонить" class="button-act-with-friend trash-friend-button"><i class="bi bi-person-x-fill"></i></div></a>
                                     </div>
                                 </div>
                             {% endfor %}
                         {% endif %}
+                        <script>
+                            let buttonsAccept = document.querySelectorAll('#put-request')
+                            console.log(buttonsAccept)
+                            for (let i=0; i < buttonsAccept.length; i++){
+                                console.log(buttonsAccept[i])
+                                buttonsAccept[i].addEventListener('click', async (e) => {
+                                // e.preventDefault();
+                                try {
+                                    const req_id = e.currentTarget.dataset.req_id
+                                    const response = await fetch(`/accept_request/${req_id}`, { 
+                                    method: 'POST',
+                                    });
+                                    // Обработка ответа
+                                } catch (error) {
+                                    console.error('Ошибка:', error);
+                                }
+                                location.reload()
+                                });
+                            }
+                            
+                        </script>
+                        <script>
+                            let buttonsReject = document.querySelectorAll('#del-request')
+                            console.log(buttonsReject)
+                            for (let i=0; i < buttonsReject.length; i++){
+                                console.log(buttonsReject[i])
+                                buttonsReject[i].addEventListener('click', async (e) => {
+                                // e.preventDefault();
+                                try {
+                                    const req_id = e.currentTarget.dataset.req_id
+                                    const response = await fetch(`/reject_request/${req_id}`, { 
+                                    method: 'POST',
+                                    });
+                                    // Обработка ответа
+                                } catch (error) {
+                                    console.error('Ошибка:', error);
+                                }
+                                location.reload()
+                                });
+                            }
+                            
+                        </script>
                         <script>
                             let bell = document.querySelector(".bi-bell");
                             bell.addEventListener('click', function(){

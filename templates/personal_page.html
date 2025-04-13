@@ -14,10 +14,44 @@
                             <a class="edit-profile-button" href="/settings">Редактировать профиль</a>
                         {% elif serch_user_in_friends %}
                             <a class="edit-profile-button" href="/private_chat/{{user_chat_id}}">Написать</a>
-                        {% elif serch_user in requests %}
-                            <p class="edit-profile-button">Запрос отправлен</p>
+                        {% elif serch_user_in_friend_requests %}
+                            <a id="put-link" class="edit-profile-button">Принять</a>
+                            <script>
+                                document.querySelector('#put-link').addEventListener('click', async (e) => {
+                                e.preventDefault();
+                                console.log("kkkkkk")
+                                let serch_user = '{{ serch_user }}'
+                                try {
+                                    const response = await fetch(`/accept_request/${serch_user}`, { 
+                                    method: 'POST',
+                                    });
+                                    // Обработка ответа
+                                } catch (error) {
+                                    console.error('Ошибка:', error);
+                                }
+                                location.reload()
+                                });
+                            </script>
                         {% else %}
-                            <a class="edit-profile-button" href="/add_friend/{{ serch_user }}">Добавить в друзья</a>
+                            <a class="edit-profile-button" id="post-link" href="#">Добавить в друзья</a>
+                            <script>
+                                document.getElementById('post-link').addEventListener('click', async (e) => {
+                                e.preventDefault();
+                                let serch_user = '{{ serch_user }}'
+                                  try {
+                                    const response = await fetch('/add_friend/{{ serch_user }}', {
+                                      method: 'POST',
+                                      headers: {
+                                        'Content-Type': 'application/json',
+                                      },
+                                      body: JSON.stringify({ data: serch_user })
+                                    });
+                                    // Обработка ответа
+                                  } catch (error) {
+                                    console.error('Ошибка:', error);
+                                  }
+                                });
+                                </script>
                         {% endif %}
                     </div>
                 </div>

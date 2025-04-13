@@ -50,7 +50,11 @@
                     <div class="selected-friend" data-friend-id="{{i.id}}">
                         <img {% if i.img_avatar %} src="{{i.img_avatar}}" {% else %} src="../static/img/avatar.jpg" {% endif %} alt="Аватар">
                         <span>{{i.name}}</span>
+                        {% if not chat_type %}
                         <button onclick="document.querySelector('.selected-friends-list').removeChild(this.closest('.selected-friend'))" class="remove-friend">&times;</button>
+                        {% else %}
+                        <button onclick="alert('Нельзя изменять участников личного чата')" class="remove-friend">&times;</button>
+                        {% endif %}
                     </div>
                     {% endfor %}
                     {% endif %}
@@ -98,7 +102,13 @@ const chatNameInput = document.querySelector('.chat-name');
 const chatAvatarInput = document.querySelector('#chat-avatar');
 const chatAvatarPreview = document.querySelector('#chat-avatar-preview');
 const createChatButton = document.querySelector('.create-chat-button');
-
+</script>
+{% if chat_type %}
+<script>
+friendsList.addEventListener('click', function(event) {alert("Нельзя изменять участников личного чата")})
+</script>
+{% else %}
+<script>
 // Обработчик клика по друзьям
 friendsList.addEventListener('click', function(event) {
     const friendItem = event.target.closest('.friend-item');
@@ -132,8 +142,9 @@ friendsList.addEventListener('click', function(event) {
     }
 });
 
-
-
+</script>
+{% endif %}
+<script>
 // Обработчик изменения аватара чата
 chatAvatarInput.addEventListener('change', function(event) {
     const file = event.target.files[0];

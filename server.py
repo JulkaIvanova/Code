@@ -1,6 +1,7 @@
 import flask as f
 from flask import render_template, request, redirect, flash, url_for, jsonify
 import os
+from sqlalchemy import and_
 import datetime
 from werkzeug.utils import secure_filename
 from flask_socketio import SocketIO, emit, join_room
@@ -185,26 +186,56 @@ def likes():
 
 @app.route('/friends', methods=['POST', 'GET'])
 def friends():
+
+
+    class SupportFriend:
+        def __init__(self, friend, chat_id):
+            self.friend=friend
+            self.chat_id = chat_id
+
+
     if not current_user.is_authenticated:
         return redirect("/")
     form = SerchUserForm()
     if form.validate_on_submit():
         return redirect(f"/id/{form.serch_user_id.data}")
+    db_sess = db_session.create_session()
+    friend_requests = current_user.friends_requests
+    friends_from_request = []
+    if friend_requests:
+        for i in friend_requests.split(","):
+            friends_from_request.append(db_sess.query(User).filter(User.id == int(i)).first())
+    friends = []
+    if current_user.friends_ids:
+        for i in current_user.friends_ids.split(","):
+            friend = db_sess.query(User).get(int(i))
+            if friend:
+                friends.append(friend)
+    user_friends = []
+    for i in friends:
+        chat_id = 0
+        user = i
+        if current_user.private_chat_ids and user.private_chat_ids:
+            cur_chat_ids = current_user.private_chat_ids.split(",")
+            user_chat_ids = user.private_chat_ids.split(",")
+            print(user_chat_ids)
+            print(cur_chat_ids)
+            chat = db_sess.query(PrivateChat).filter(
+            and_(
+            PrivateChat.private_chat_with_friend == True,
+            PrivateChat.id.in_(cur_chat_ids), 
+            PrivateChat.id.in_(user_chat_ids)
+            )
+            ).first()
+            if chat:
+                chat_id = chat.id
+        if chat_id > 0:
+            user_friends.append(SupportFriend(i, chat_id))
     html = f.render_template(r"friends.html", 
                             form=form,
                             ClientId = f'/id/{current_user.id}', 
-                            friends=2,
-                            friend_id=[2, 3],
-                            friend_avatar=["../static/img/post_test_3.jpg", "../static/img/post_test_2.jpg"],
-                            friend_name=['кто-то', 'НеЮля'],
-                            friend_surname=['Кто-тович', 'НеИванова'],
-                            chat_id=['1', '2'],
-                            is_block = [True, False],
-                            cntRequests=2,
-                            friend_request_id=[2, 3],
-                            friend_request_avatar=['../static/img/post_test_2.jpg', '../static/img/logo.png'],
-                            friend_request_name=['rrrrr', 'hhhhhh'],
-                            friend_request_surname=['ggggg', 'jjjjj'],
+                            friends=user_friends,
+                            friends_from_request = friends_from_request,
                             seeFilter = False)
     return html
 
@@ -251,7 +282,35 @@ def id(Clientid):
         print("OK")
         print(current_user.id)
         return redirect(f"/id/{current_user.id}")
-    print(f"/id/{current_user.id}")
+    
+    friend_requests = current_user.friends_requests
+    current_friends = current_user.friends_ids
+    friends = []
+    if current_friends:
+        friends = current_friends.split(",")
+    friends_from_request = []
+    if friend_requests:
+        for i in friend_requests.split(","):
+            friends_from_request.append(db_sess.query(User).filter(User.id == int(i)).first())
+        friend_requests = friend_requests.split(",")
+    else:
+        friend_requests = []
+    chat_id = 0
+    if current_user.private_chat_ids and user.private_chat_ids:
+        cur_chat_ids = current_user.private_chat_ids.split(",")
+        user_chat_ids = user.private_chat_ids.split(",")
+        print(user_chat_ids)
+        print(cur_chat_ids)
+        chat = db_sess.query(PrivateChat).filter(
+        and_(
+        PrivateChat.private_chat_with_friend == True,
+        PrivateChat.id.in_(cur_chat_ids), 
+        PrivateChat.id.in_(user_chat_ids)
+        )
+        ).first()
+        if chat:
+            chat_id = chat.id
+
     ClientId = f"/id/{current_user.id}"
     html = f.render_template(
         r"post_block.html",
@@ -286,22 +345,16 @@ def id(Clientid):
         caption=["Описание 1", "Описание 2", "Описание 3"],
         serch_user=Clientid,
         form=form,
-        cntRequests=0,
-        friend_request_id=[],
-        friend_request_avatar=[],
-        friend_request_name=[],
-        friend_request_surname=[],
         seeFilter = True,
         chat_id = ['1', '2', '3'],
         postCntLikes = [25, 60, 5],
         postCntComments = [3, 40, 1],
         postCreators = [user.id, user.id, user.id],
-        # userBackground = '../static/img/post_test_2.jpg',
-        # userAvatar = '../static/img/post_test_3.jpg',
-        # CurrentUserAvatar = '../static/img/post_test_2.jpg',
-        # serch_user_in_friends = False,
-        # requests = [1, 3],
-        # user_chat_id = 8,
+
+        user_chat_id=chat_id,
+        friends_from_request = friends_from_request,
+        serch_user_in_friends = str(Clientid) in friends,
+        serch_user_in_friend_requests = str(Clientid) in friend_requests
     )
     return html
 
@@ -360,6 +413,7 @@ def edit_chat(chat_id):
     html = f.render_template(r"create_chat.html", 
                             friends = friends,
                             members = members,
+                            chat_type=chat.private_chat_with_friend,
                             chat_avatar = chat_avatar,
                             chat_name = chat.chat_name
                             )
@@ -402,6 +456,11 @@ def private_chat(id):
     chat_avatar = rf"..\static\img\chat.png"
     if private_chat.chat_avatar:
         chat_avatar = private_chat.chat_avatar
+    friend_requests = current_user.friends_requests
+    friends_from_request = []
+    if friend_requests:
+        for i in friend_requests.split(","):
+            friends_from_request.append(db_sess.query(User).filter(User.id == int(i)).first())
     html = f.render_template("private_chat.html",
                              chat_id = int(id),
                             chat_avatar=chat_avatar,
@@ -410,11 +469,7 @@ def private_chat(id):
                             messages = messages,
                             form = form,
                             ClientId = f'/id/{current_user.id}',
-                            cntRequests=2,
-                            friend_request_id=[2, 3],
-                            friend_request_avatar=['../static/img/post_test_2.jpg', '../static/img/logo.png'],
-                            friend_request_name=['rrrrr', 'hhhhhh'],
-                            friend_request_surname=['ggggg', 'jjjjj'],
+                            friends_from_request = friends_from_request,
                             seeFilter = False)
     return html
 
@@ -462,6 +517,7 @@ def chat(id):
     form = SerchUserForm()
     if form.validate_on_submit():
         return redirect(f"/id/{form.serch_user_id.data}")
+    
     html = f.render_template("chat.html",
                             messages = [TestMessage("dfhdhfhhfhe", "Julia", "00:02", True, "../static/img/post_test_2.jpg"), TestMessage("dfhdhfhhfhe", "NotJulia", "00:02", False, "../static/img/post_test_1.jpg"), TestMessage("dfhdhfhhfhe", "Julia", "00:02", True, "../static/img/post_test_2.jpg"), TestMessage("dfhdhfhhfhehh\nhhhhhhhhhhhhhh\nhhhhhhhh hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh", "some", "00:02", False, "../static/img/post_test_3.jpg")],
                             form = form,
@@ -483,19 +539,25 @@ def chats():
     form = SerchUserForm()
     if form.validate_on_submit():
         return redirect(f"/id/{form.serch_user_id.data}")
+    db_sess = db_session.create_session()
+    private_chat_ids = current_user.private_chat_ids
+    chats = []
+    if private_chat_ids:
+        for i in private_chat_ids.split(","):
+            chat = db_sess.query(PrivateChat).filter(PrivateChat.id == int(i)).first()
+            if chat:
+                chats.append(chat)
+    print(chats)
+    friend_requests = current_user.friends_requests
+    friends_from_request = []
+    if friend_requests:
+        for i in friend_requests.split(","):
+            friends_from_request.append(db_sess.query(User).filter(User.id == int(i)).first())
     html = f.render_template(r"chats.html", 
                             form=form,
                             ClientId = f'/id/{current_user.id}', 
-                            chats=2,
-                            chat_avatar=["../static/img/post_test_3.jpg", "../static/img/post_test_2.jpg"],
-                            chat_name = ['tttt', 'nnnnnn'],
-                            chat_id=['1', '2'],
-                            is_block = [True, False],
-                            cntRequests=2,
-                            friend_request_id=[2, 3],
-                            friend_request_avatar=['../static/img/post_test_2.jpg', '../static/img/logo.png'],
-                            friend_request_name=['rrrrr', 'hhhhhh'],
-                            friend_request_surname=['ggggg', 'jjjjj'],
+                            chats=chats,
+                            friends_from_request = friends_from_request,
                             seeFilter = False)
     return html
 
@@ -617,7 +679,7 @@ def save_file(file, folder):
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return render_template("404.html", ClientId=current_user.id), 404
+    return render_template("404.html"), 404
 
 
 if __name__ == "__main__":
