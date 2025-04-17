@@ -22,14 +22,14 @@ class CustomRadioField(RadioField):
 
 class CreatePostForm(FlaskForm):
     imgs = MultipleFileField(validators=[
-        FileAllowed(['jpg', 'jpeg', 'png']),
+        FileAllowed(["png", "jpg", "jpeg", "gif"]),
         FileSize(max_size=10 * 1024 * 1024)
     ])
     caption = TextAreaField()
     category = CustomRadioField(choices=[
-        ('common', '#Общее'),
+        ('all', '#Общее'),
         ('guide', '#Гайды'),
         ('mems', '#Мемы'),
         ('ideas', '#Идеи')
-    ], default='common')
+    ], default='all')
     submit = SubmitField('Готово')

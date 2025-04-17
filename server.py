@@ -27,7 +27,8 @@ from forms.edit_post_form import EditPostForm
 from data.api import*
 from flask_restful import Api
 
-
+def allowed_file(filename, allowed_extensions={'png', 'jpg', 'jpeg', 'gif'}):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
 app = f.Flask(__name__)
 socketio = SocketIO(app)
@@ -59,6 +60,7 @@ def load_user(user_id):
 @app.route("/create_accaunt", methods=["GET", "POST"])
 def form():
     form = Registration()
+    
     if form.validate_on_submit():
         if form.password.data != form.password_repeat.data:
             return render_template(
@@ -89,49 +91,71 @@ def form():
 
 @app.route('/main', methods=['POST', 'GET'])
 def main():
+
+
+    class SupportPost:
+        def __init__(self, post, chat, commentcnt, likeBool, post_img):
+            self.post = post
+            self.chat = chat
+            self.commentcnt = commentcnt
+            self.likeBool = likeBool
+            self.post_img = post_img
+
+
     if not current_user.is_authenticated:
         return redirect("/")
     form = SerchUserForm()
     createPostForm = CreatePostForm()
+    db_sess = db_session.create_session()
     if form.validate_on_submit() and form.serch_user_id.data:
         return redirect(f"/id/{form.serch_user_id.data}")
     if createPostForm.validate_on_submit():
-        print("OK")
-        print(current_user.id)
+        post_imgs_filenames = []
+        if createPostForm.imgs.data:
+            files = createPostForm.imgs.data
+            for file in files:
+                filename = secure_filename(file.filename)
+                post_img_filenames  = f"avatar_{uuid.uuid4()}_{filename}"
+                file.save(os.path.join('static\chat_avatars', post_img_filenames))
+                post_imgs_filenames.append(rf"..\static\chat_avatars\{post_img_filenames}".replace(",", '!'))
+        print("++")  
+        chat = Chat()
+        db_sess.add(chat)
+        db_sess.commit()
+
+        post = Posts(
+            caption=createPostForm.caption.data,
+            imgs=",".join(post_imgs_filenames),
+            category=createPostForm.category.data,
+            comments_ids = chat.id,
+            creater = current_user.id,
+            likes = 0,    
+        )
+        db_sess.add(post)
+        db_sess.commit()
         return redirect(f"/id/{current_user.id}")
-    #Из пост запроса получаем id пользователя и меняем страницу в зависимости от полученной информации
+    posts_info = db_sess.query(Posts).all()
+    posts = []
+    for i in posts_info:
+        chat = db_sess.query(Chat).get(int(i.comments_ids))
+        if chat:
+            commentcnt = chat.comments.split(",") if chat.comments else []
+            likeBool = str(current_user.id) in i.likes_user_id.split(",") if i.likes_user_id else False
+            posts.append(SupportPost(i, chat, len(commentcnt), likeBool, post_img=i.imgs.split(",") if i.imgs else None))
+    friend_requests = current_user.friends_requests
+    friends_from_request = []
+    if friend_requests:
+        for i in friend_requests.split(","):
+            friends_from_request.append(db_sess.query(User).filter(User.id == int(i)).first())
     html = f.render_template(r"post_block_main.html",
                              createPostForm = createPostForm, 
-                            post_id=[1, 2, 3], 
                             form=form, 
                             ClientId=f'id/{current_user.id}',  
-                            cntBlocks=3, 
-                            imgs=[
-                                ['../static/img/post_test_1.jpg', 
-                                 '../static/img/post_test_2.jpg', 
-                                 '../static/img/post_test_3.jpg', 
-                                 '../static/img/avatar.jpg'], 
-                                ['../static/img/post_test_1.jpg', 
-                                 '../static/img/post_test_2.jpg', 
-                                 '../static/img/post_test_3.jpg', 
-                                 '../static/img/avatar.jpg'], 
-                                ['../static/img/post_test_1.jpg', 
-                                 '../static/img/post_test_2.jpg', 
-                                 '../static/img/post_test_3.jpg', 
-                                 '../static/img/avatar.jpg']], 
-                                likesBool=[0, 0, 0], 
-                                id=['#aa', '#bb', '#cc'], 
-                                caption=["Описание 1","Описание 2","Описание 3"],
-                                cntRequests=2,
-                                friend_request_id=[2, 3],
-                                friend_request_avatar=['../static/img/post_test_2.jpg', '../static/img/logo.png'],
-                                friend_request_name=['rrrrr', 'hhhhhh'],
-                                friend_request_surname=['ggggg', 'jjjjj'],
-                                seeFilter = True,
-                                chat_id = ['1', '2', '3'],
-                                postCntLikes = [25, 60, 5],
-                                postCntComments = [3, 40, 1],
-                                postCreators = [1, 2, 1])
+                            posts=posts,
+                            cntposts = len(posts),
+                            friends_from_request = friends_from_request,
+                            seeFilter = True,
+                            )
     filter_value = request.args.get('filter')
     print(filter_value)
     return html
@@ -143,12 +167,18 @@ def likes():
         return redirect("/")
     form = SerchUserForm()
     createPostForm = CreatePostForm()
+    db_sess = db_session.create_session()
     if form.validate_on_submit() and form.serch_user_id.data:
         return redirect(f"/id/{form.serch_user_id.data}")
     if createPostForm.validate_on_submit():
         print("OK")
         print(current_user.id)
         return redirect(f"/id/{current_user.id}")
+    friend_requests = current_user.friends_requests
+    friends_from_request = []
+    if friend_requests:
+        for i in friend_requests.split(","):
+            friends_from_request.append(db_sess.query(User).filter(User.id == int(i)).first())
     #Из пост запроса получаем id пользователя и меняем страницу в зависимости от полученной информации
     html = f.render_template(r"post_block_likes.html",
                             createPostForm=createPostForm, 
@@ -171,11 +201,7 @@ def likes():
                                 likesBool=[1, 1, 1], 
                                 id=['#aa', '#bb', '#cc'], 
                                 caption=["Описание 1","Описание 2","Описание 3"],
-                                cntRequests=0,
-                                friend_request_id=[],
-                                friend_request_avatar=[],
-                                friend_request_name=[],
-                                friend_request_surname=[],
+                                friends_from_request = friends_from_request,
                                 seeFilter = True,
                                 chat_id = ['1', '2', '3'],
                                 postCntLikes = [25, 60, 5],
