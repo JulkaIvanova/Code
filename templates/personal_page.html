@@ -1,15 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
-                <div {% if userBackground %} style="background: url({{userBackground}}) 100%;" {% endif %} class="div-with-user-info">
+                <div {% if user.img_profile %} style="background: url({{user.img_profile}}) no-repeat;background-size: cover;" {% endif %} class="div-with-user-info">
                     <div class="div-with-avatar">
                         <div class="avatar-box">
-                            {% if userAvatar %}
-                                <img class="avatar-img" src="{{userAvatar}}" alt="">
-                            {% else %}
-                                <img class="avatar-img" src="../static/img/avatar.jpg">
-                            {% endif %}
+                            <img class="avatar-img" {% if user.img_avatar %} src="{{user.img_avatar}}" {% else %} src="../static/img/avatar.jpg" {% endif %} alt="">
                         </div>
-                        <h1 class="UserName">{{UserName}}</h1>
+                        <h1 class="UserName">{{user.name}}</h1>
                         {% if current_user.is_authenticated and current_user.id == serch_user %}
                             <a class="edit-profile-button" href="/settings">Редактировать профиль</a>
                         {% elif serch_user_in_friends %}

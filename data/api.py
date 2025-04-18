@@ -208,7 +208,7 @@ class MessageResource(Resource):
             db_sess.commit()
             
             # Обновление чата
-            chat = db_sess.query(PrivateChat).get(args['chatID'])
+            chat = db_sess.query(PrivateChat).get(args['chatID']) if comment.type == "private" else db_sess.query(Chat).get(args['chatID'])
             if chat:
                 chat.comments = f"{chat.comments},{comment.id}" if chat.comments else str(comment.id)
                 db_sess.commit()
@@ -461,6 +461,17 @@ class RemoveFriendResource(Resource):
             db_sess.close()
 
 
+class DeletePostResource(Resource):
+    def delete(post_id):
+        # Здесь нужно описать функцию которая удаляет пост. Для этого нужно:
+        # - узнать категорию данного поста
+        # - пройтись по всем пользователям и если у него в столбце категории поста(их у пользователя 4 поэтому и необходимо понять откуда удолять, для этого узнаём категорию потса) есть текущий пост то добавить его в список (утчти что в столбце храниться строка вида: 1,2,3 или 1, или None. Нужно разделить эту строку по разделитель "," или же вернуть [] если это None )
+        # - затем удолить у пользователя id поста из колонок: колонка категории поста(их у пользователя 4 поэтому и необходимо понять откуда удолять, для этого узнаём категорию потса), post_like_ids, если это текущий пользователь то также нужно удолить из колонки post_ids. id здесь хранятся так же как и в предидущем случае.
+        # - из колнки comments_ids узнать id чата который относится к этому посту. ищи в Chat. Его тоже нужно удалить
+        # - в конце удаляешь и сам пост из таблицы Posts
+        # - не забудь проверит чтобы удолял тот кому этот пост пренадлежит (да и в принципе чтобы этот пользователь был авторизован)
+        pass
+
 # Инициализация API
 def init_api(api):
     api.add_resource(LikeResource, '/api/like')
@@ -470,3 +481,4 @@ def init_api(api):
     api.add_resource(AcceptFriendRequestResource, '/accept_request/<user_id>')
     api.add_resource(RejectFriendRequestResource, '/reject_request/<user_id>')
     api.add_resource(RemoveFriendResource, '/delete_friend/<friend_id>')
+    api.add_resource(DeletePostResource, '/del_post/<post_id>')

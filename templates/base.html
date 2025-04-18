@@ -117,8 +117,8 @@
             </div>
             <div style="text-align: right; min-width: 30px;">
                 <div class="avatar-box-heder">
-                    {% if CurrentUserAvatar %}
-                        <a id="avatar-img-heder-linck" href={{ClientId}}><img class="avatar-img-heder" src="{{CurrentUserAvatar}}" alt=""></a>
+                    {% if current_user.img_avatar %}
+                        <a id="avatar-img-heder-linck" href={{ClientId}}><img class="avatar-img-heder" src="{{current_user.img_avatar}}" alt=""></a>
                     {% else %}
                         <a id="avatar-img-heder-linck" href={{ClientId}}><img class="avatar-img-heder" src="../static/img/avatar.jpg"></a>
                     {% endif %}

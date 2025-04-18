@@ -3,6 +3,15 @@
 {% block posts %}
     {% for i in range(cntposts) %}
         <div class="wrapper-carousel">
+            <div class="friend-item">
+                <div class="avatar-and-name-friend">
+                    <div class="friend-avatar-box-create-chat">
+                        <a href="/id/{{posts[i].user.id}}"><img class="friend-avatar-create-chat" {% if posts[i].user.img_avatar %} src="{{posts[i].user.img_avatar}}" {% else %} src="../static/img/avatar.jpg" {% endif %} alt=""></a>
+                    </div>
+                    <p style="margin-right: 10px; max-width: 450px; overflow: hidden;" class="name-friend-create-chat">{{posts[i].user.name}}</p>
+                    <p style="max-width: 450px; overflow: hidden;" class="name-friend-create-chat">{{posts[i].user.surname}}</p>
+                </div>
+            </div>
             <div {% if not posts[i].post_img %} style="height: auto; overflow-wrap: break-word;" {% else %} style="overflow-wrap: break-word;" {% endif %} id=Post_{{posts[i].post.id}} class="carousel slide">
                 {% if posts[i].post_img %}
                 <div class="carousel-inner">
