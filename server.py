@@ -24,7 +24,7 @@ from forms.create_post_form import CreatePostForm
 from forms.registr_form import *
 from forms.serch_user import SerchUserForm
 from forms.edit_post_form import EditPostForm
-from data.api import*
+from data.api import *
 from flask_restful import Api
 
 class SupportPost:
@@ -153,6 +153,7 @@ def main():
     friends_from_request = []
     if friend_requests:
         for i in friend_requests.split(","):
+            friends_from_request.append(db_sess.query(User).filter(User.id == int(i)).first())
             friends_from_request.append(db_sess.query(User).filter(User.id == int(i)).first())
     html = f.render_template(r"post_block_main.html",
                              createPostForm = createPostForm, 
@@ -608,8 +609,9 @@ def edit_post(post_id):
     # Здесь нужно описать то как данные о посте достаются из бд
     if request.method == "GET":
         post_id = int(post_id)
-        caption = "Описание 1" # сюда вставляешь данные post.caption
-        form1.caption.data = caption
+        post = db_sess.query(Posts).get(post_id)
+
+        form1.caption.data = post.caption
         friend_requests = current_user.friends_requests
         friends_from_request = []
         if friend_requests:
@@ -621,9 +623,14 @@ def edit_post(post_id):
                             seeFilter = False )
     elif request.method == "POST":
         if form1.validate_on_submit():
-            #нужно внести изменения в БД (а имено изменени описание. Здесь можно редактировать только его)
-            print(form1.caption.data)
-            return redirect("/main")
+            try:
+                #нужно внести изменения в БД (а имено изменени описание. Здесь можно редактировать только его)
+                post.caption = form1.caption.data
+                db_sess.commit()
+                return redirect("/main")
+            except Exception as e:
+                print(e)
+                abort(402)
         #здесь нужно придумать как будет обрабатывать случай если пользователь ввёл что либо не коректно
 
 
@@ -776,4 +783,4 @@ def page_not_found(e):
 
 if __name__ == "__main__":
     # app.run(port=8080, host="127.0.0.1")
-    socketio.run(app, debug=True)
+    socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
