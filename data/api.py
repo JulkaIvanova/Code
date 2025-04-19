@@ -53,8 +53,85 @@ class LikeResource(Resource):
             return {"error": "Требуется авторизация"}, 401
         print("hhhh")
         args = like_parser.parse_args()
+        db_sess = db_session.create_session()
         try:
             print(f"Получен лайк: Пост {args['postId']}, Пользователь {args['userId']}, Лайков: {args['likesCount']}")
+            post_id = args['postId'][5:]
+            print(post_id)
+            user_id = args['userId']
+            print(user_id)
+            post_category = db_sess.query(Posts).get(post_id).category
+            user = db_sess.query(User).get(user_id)
+            post_likes = db_sess.query(Posts).get(post_id).likes_user_id
+            user_likes = user.post_like_ids
+            post_likes_count = db_sess.query(Posts).get(post_id).likes
+
+
+            if user_likes is not None:
+                user_likes = user_likes.split(',')
+
+                if post_id not in user_likes:
+                    user_likes.append(post_id)
+                user_likes = ','.join(user_likes)
+            else:
+                user_likes = post_id
+
+            if post_category == 'common':
+                user_likes_common = user.post_like_common_category_ids
+                if user_likes_common is not None:
+                    user_likes_common = user_likes_common.split(',')
+                    user_likes_common.append(post_id)
+                    user_likes_common = ','.join(user_likes_common)
+                else:
+                    user_likes_common = post_id
+                user.post_like_common_category_ids = user_likes_common
+
+
+            elif post_category == 'guide':
+                user_likes_guide = user.post_like_guide_category_ids
+                if user_likes_guide is not None:
+                    user_likes_guide = user_likes_guide.split(',')
+                    user_likes_guide.append(post_id)
+                    user_likes_guide = ','.join(user_likes_guide)
+                else:
+                    user_likes_guide = post_id
+                user.post_like_guide_category_ids = user_likes_guide
+
+            elif post_category == 'ideas':
+                user_likes_ideas = user.post_like_ideas_category_ids
+                if user_likes_ideas is not None:
+                    user_likes_ideas = user_likes_ideas.split(',')
+                    user_likes_ideas.append(post_id)
+                    user_likes_ideas = ','.join(user_likes_ideas)
+                else:
+                    user_likes_ideas = post_id
+                user.post_like_ideas_category_ids = user_likes_ideas
+
+            elif post_category == 'mems':
+                user_likes_mems = user.post_like_mems_category_ids
+                if user_likes_mems is not None:
+                    user_likes_mems = user_likes_mems.split(',')
+                    user_likes_mems.append(post_id)
+                    user_likes_mems = ','.join(user_likes_mems)
+                else:
+                    user_likes_mems = post_id
+                user.post_like_mems_category_ids = user_likes_mems
+
+            if post_likes is not None:
+                post_likes = post_likes.split(',')
+                if user_id not in post_likes:
+                    post_likes.append(user_id)
+                    post_likes_count = str(int(post_likes_count) + 1)
+                    db_sess.query(Posts).get(post_id).likes = post_likes_count
+                post_likes = ','.join(post_likes)
+            else:
+                post_likes = user_id
+                post_likes_count = str(int(post_likes_count) + 1)
+                db_sess.query(Posts).get(post_id).likes = post_likes_count
+            db_sess.query(Posts).get(post_id).likes_user_id = post_likes
+            user.post_like_ids = user_likes
+
+            db_sess.commit()
             return jsonify({
                 'status': 'success',
                 'message': 'Like processed',
