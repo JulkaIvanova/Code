@@ -513,6 +513,10 @@ class DeletePostResource(Resource):
                 if post_id in user_posts_post_like_common_category_ids:
                     user_posts_post_like_common_category_ids.remove(post_id)
                     user.post_like_common_category_ids = ','.join(user_posts_post_like_common_category_ids)
+        chat = db_sess.query(Chat).get(int(post.comments_ids))
+        if chat:
+            db_sess.delete(chat)
+            db_sess.commit()
         db_sess.delete(post)
         db_sess.commit()
 
