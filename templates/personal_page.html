@@ -90,6 +90,7 @@
                         </form>
                     </div>
                 </div>
+                <div class="contaner_for_img"></div>
                 {% block posts %}{% endblock %}
         <script>
             let contaner = document.getElementsByClassName('likes');
@@ -129,27 +130,6 @@
                 }
             }
 
-            // function cntLikesUp() {
-            //     let likeContaner = this.parentElement;
-            //     if (flags[+(likeContaner.id)]) return;
-            //     let cntLikes = likeContaner.querySelector('span').innerText;
-            //     this.className = "bi bi-heart-fill";
-            //     cntLikes = +cntLikes + 1;
-            //     likeContaner.querySelector('span').innerText = cntLikes;
-            //     let support = likeContaner.parentElement
-            //     support = support.parentElement
-            //     support = support.parentElement
-            //     let currentPost = support.querySelector(".carousel")
-            //     console.log(currentPost.id)
-            //     console.log(support)
-            //     let a = document.querySelector("#avatar-img-heder-linck").href
-            //     console.log(a.split("id/")[1])
-            //     flags[+(likeContaner.id)] = true;
-
-            //     let currentPostId = currentPost.id
-            //     let currentUserId = a.split("id/")[1]
-
-            // }
             function cntLikesUp() {
                 let likeContaner = this.parentElement;
                 if (flags[+(likeContaner.id)]) return;
@@ -217,5 +197,52 @@
                     };
                 };
             };
+        </script>
+        <script>
+            let imgs = document.querySelectorAll("#img");
+            for (let i = 0; i < imgs.length; i++) {
+                imgs[i].addEventListener("click", lookImg);
+            }
+            
+            function lookImg() {
+                // Создаем контейнер для увеличенного изображения
+                let container = document.querySelector(".contaner_for_img");
+                container.innerHTML = '';
+                
+                // Создаем увеличенное изображение с сохранением пропорций
+                let enlargedImg = new Image();
+                enlargedImg.src = this.src;
+                enlargedImg.style.maxWidth = "90vw";  // 90% ширины экрана
+                enlargedImg.style.maxHeight = "90vh"; // 90% высоты экрана
+                enlargedImg.style.objectFit = "contain"; // сохраняет пропорции
+                enlargedImg.style.position = "fixed";
+                enlargedImg.style.top = "50%";
+                enlargedImg.style.left = "50%";
+                enlargedImg.style.transform = "translate(-50%, -50%)";
+                enlargedImg.style.zIndex = "100000000";
+                
+                
+                // Добавляем затемнение фона
+                let overlay = document.createElement("div");
+                overlay.style.position = "fixed";
+                overlay.style.top = "0";
+                overlay.style.left = "0";
+                overlay.style.width = "100%";
+                overlay.style.height = "100%";
+                overlay.style.backgroundColor = "rgba(0,0,0,0.7)";
+                overlay.style.zIndex = "99999999";
+                overlay.style.cursor = "zoom-out";
+                
+                // Закрытие по клику на затемнение
+                overlay.addEventListener("click", function() {
+                    document.body.removeChild(overlay);
+                    document.body.removeChild(enlargedImg);
+                    document.body.style.overflow = 'auto'
+                });
+                
+                document.body.appendChild(overlay);
+                document.body.appendChild(enlargedImg);
+                document.body.style.overflow = 'hidden'
+            }
         </script>
 {% endblock %}
