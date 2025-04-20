@@ -6,6 +6,8 @@ from .users import User
 
 
 def parse_ids(s: str) -> List[int]:
+    if not s:
+        return []
     return [int(x) for x in s.split(',') if x.strip().isdigit()]
 
 

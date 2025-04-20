@@ -143,13 +143,13 @@
                             <input type="radio" id="all" name="filter" value="all" onclick="updateURL('all')">
                             <label for="all">Общее</label>
                             <br>
-                            <input type="radio" id="memes" name="filter" value="memes" onclick="updateURL('memes')">
+                            <input type="radio" id="memes" name="filter" value="memes" onclick="updateURL('mems')">
                             <label for="memes">Мемы</label>
                             <br>
                             <input type="radio" id="ideas" name="filter" value="ideas" onclick="updateURL('ideas')">
                             <label for="ideas">Идеи</label>
                             <br>
-                            <input type="radio" id="guides" name="filter" value="guides" onclick="updateURL('guides')">
+                            <input type="radio" id="guides" name="filter" value="guides" onclick="updateURL('guide')">
                             <label for="guides">Гайды</label>
                             <br>
                             <input type="radio" id="nofilter" name="filter" value="" checked onclick="updateURL('')">
@@ -166,6 +166,7 @@
                             }
                             
                             history.pushState({}, '', currentURL.href);
+                            location.reload()
                         }
 
                         // При загрузке страницы проверяем текущий URL и выбираем соответствующую радиокнопку
@@ -176,6 +177,7 @@
                             if (currentFilter) {
                                 document.querySelector(`input[name="filter"][value="${currentFilter}"]`).checked = true;
                             }
+                            
                         });
                         let filterButton = document.querySelector("#bi-sliders2");
                         let cntClick = 0;

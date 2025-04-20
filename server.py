@@ -142,7 +142,14 @@ def main():
         db_sess.commit()
         return redirect(f"/id/{current_user.id}")
     posts_info = db_sess.query(Posts).all()
-    posts_info = custom_sorted_posts(posts_info, "guide")
+    filter_value = request.args.get('filter')
+    print(filter_value)
+    if filter_value:
+        print("KKKKKKK")
+        posts_info = custom_sorted_posts(posts_info, filter_value)
+    else:
+        print("jjjjj")
+        posts_info = sort_posts_by_user_likes(current_user, posts_info)
     posts = []
     for i in posts_info:
         chat = db_sess.query(Chat).get(int(i.comments_ids))
@@ -167,8 +174,7 @@ def main():
                             friends_from_request = friends_from_request,
                             seeFilter = True,
                             )
-    filter_value = request.args.get('filter')
-    print(filter_value)
+    
     return html
 
 
@@ -210,6 +216,12 @@ def likes():
         db_sess.commit()
         return redirect(f"/id/{current_user.id}")
     posts_info = db_sess.query(Posts).all()
+    filter_value = request.args.get('filter')
+    print(filter_value)
+    if filter_value:
+        posts_info = custom_sorted_posts(posts_info, filter_value)
+    else:
+        posts_info.reverse()
     posts = []
     for i in posts_info:
         chat = db_sess.query(Chat).get(int(i.comments_ids))
@@ -220,7 +232,7 @@ def likes():
                 commentcnt = chat.comments.split(",") if chat.comments else []
                 likeBool = str(current_user.id) in i.likes_user_id.split(",") if i.likes_user_id else False
                 posts.append(SupportPost(i, chat, len(commentcnt), likeBool, post_img=i.imgs.split(",") if i.imgs else None, user=user))
-    posts.reverse()
+    # posts.reverse()
     friend_requests = current_user.friends_requests
     friends_from_request = []
     if friend_requests:
@@ -351,6 +363,12 @@ def id(Clientid):
         db_sess.commit()
         return redirect(f"/id/{current_user.id}")
     posts_info = db_sess.query(Posts).all()
+    filter_value = request.args.get('filter')
+    print(filter_value)
+    if filter_value:
+        posts_info = custom_sorted_posts(posts_info, filter_value)
+    else:
+        posts_info.reverse()
     posts = []
     for i in posts_info:
         chat = db_sess.query(Chat).get(int(i.comments_ids))
@@ -358,7 +376,7 @@ def id(Clientid):
             commentcnt = chat.comments.split(",") if chat.comments else []
             likeBool = str(current_user.id) in i.likes_user_id.split(",") if i.likes_user_id else False
             posts.append(SupportPost(i, chat, len(commentcnt), likeBool, post_img=i.imgs.split(",") if i.imgs else None, user=user))
-    posts.reverse()
+    # posts.reverse()
     friend_requests = current_user.friends_requests
     current_friends = current_user.friends_ids
     friends = []
@@ -402,7 +420,8 @@ def id(Clientid):
         user_chat_id=chat_id,
         friends_from_request = friends_from_request,
         serch_user_in_friends = str(Clientid) in friends,
-        serch_user_in_friend_requests = str(Clientid) in friend_requests
+        serch_user_in_friend_requests = str(Clientid) in friend_requests,
+        seeFilter = True
     )
     return html
 

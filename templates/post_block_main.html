@@ -38,7 +38,7 @@
             </div>
             <div style="display: flex; flex-direction: row; justify-content: space-between;">
                 <div class="likes-and-comments">
-                    <div data-bool={{posts[i].likeBool}} id={{i}} class="likes"><i {% if posts[i].likeBool == 1 %} class="bi bi-heart-fill" {% else %} class="bi bi-heart" {% endif%}></i><span style="padding-left: 10px; width: 80%;">{{posts[i].post.likes}}</span></div>
+                    <div {% if posts[i].likeBool %} data-bool='1' {% else %} data-bool='0' {% endif%} id={{i}} class="likes"><i {% if posts[i].likeBool %} class="bi bi-heart-fill" {% else %} class="bi bi-heart" {% endif%}></i><span style="padding-left: 10px; width: 80%;">{{posts[i].post.likes}}</span></div>
                     <a style="display: block;" href="/chat/{{posts[i].chat.id}}"><div class="comments"><i class="bi bi-chat-left"></i><span style="padding-left: 10px;">{{posts[i].commentcnt}}</span></div></a>
                 </div>
                 {% if posts[i].post.creater == current_user.id %}

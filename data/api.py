@@ -67,7 +67,7 @@ class LikeResource(Resource):
             post_likes_count = db_sess.query(Posts).get(post_id).likes
 
 
-            if user_likes is not None:
+            if user_likes is not None or user_likes == "":
                 user_likes = user_likes.split(',')
 
                 if post_id not in user_likes:
@@ -76,9 +76,9 @@ class LikeResource(Resource):
             else:
                 user_likes = post_id
 
-            if post_category == 'common':
+            if post_category == 'all':
                 user_likes_common = user.post_like_common_category_ids
-                if user_likes_common is not None:
+                if user_likes_common:
                     user_likes_common = user_likes_common.split(',')
                     user_likes_common.append(post_id)
                     user_likes_common = ','.join(user_likes_common)
@@ -89,7 +89,7 @@ class LikeResource(Resource):
 
             elif post_category == 'guide':
                 user_likes_guide = user.post_like_guide_category_ids
-                if user_likes_guide is not None:
+                if user_likes_guide:
                     user_likes_guide = user_likes_guide.split(',')
                     user_likes_guide.append(post_id)
                     user_likes_guide = ','.join(user_likes_guide)
@@ -99,7 +99,7 @@ class LikeResource(Resource):
 
             elif post_category == 'ideas':
                 user_likes_ideas = user.post_like_ideas_category_ids
-                if user_likes_ideas is not None:
+                if user_likes_ideas:
                     user_likes_ideas = user_likes_ideas.split(',')
                     user_likes_ideas.append(post_id)
                     user_likes_ideas = ','.join(user_likes_ideas)
@@ -109,7 +109,7 @@ class LikeResource(Resource):
 
             elif post_category == 'mems':
                 user_likes_mems = user.post_like_mems_category_ids
-                if user_likes_mems is not None:
+                if user_likes_mems:
                     user_likes_mems = user_likes_mems.split(',')
                     user_likes_mems.append(post_id)
                     user_likes_mems = ','.join(user_likes_mems)
@@ -117,7 +117,7 @@ class LikeResource(Resource):
                     user_likes_mems = post_id
                 user.post_like_mems_category_ids = user_likes_mems
 
-            if post_likes is not None:
+            if post_likes:
                 post_likes = post_likes.split(',')
                 if user_id not in post_likes:
                     post_likes.append(user_id)
