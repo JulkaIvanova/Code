@@ -693,6 +693,17 @@ def settings():
             print("Kkkkljggkxdfuh adruks")
             user = db_sess.query(User).get(current_user.id)
             try:
+                print(form2.age.data)
+                if int(form2.age.data) < 0:
+                    return render_template(
+                        "setings.html",
+                        form=form,
+                        ClientId=f"/id/{current_user.id}",
+                        form2=form2,
+                        friends_from_request = friends_from_request,
+                        seeFilter = False,
+                        message = "Возраст не может быть отрицательным!!!"
+                    )
                 # Обработка файлов
                 if form2.avatar.data:
                     file = form2.avatar.data
@@ -755,7 +766,6 @@ def settings():
                             seeFilter = False,
                             message = "Недопустимый формат!!!"
                         )
-                    
                     if not user.img_profile:
                         filename = secure_filename(file.filename)
                         avatar_filename = f"avatar_{uuid.uuid4()}_{filename}"
