@@ -26,6 +26,8 @@ from forms.serch_user import SerchUserForm
 from forms.edit_post_form import EditPostForm
 from data.api import *
 from flask_restful import Api
+from data.custom_recommendations_new import *
+from data.custom_sorted_posts_new import *
 
 class SupportPost:
         def __init__(self, post, chat, commentcnt, likeBool, post_img, user):
@@ -140,6 +142,7 @@ def main():
         db_sess.commit()
         return redirect(f"/id/{current_user.id}")
     posts_info = db_sess.query(Posts).all()
+    posts_info = custom_sorted_posts(posts_info, "guide")
     posts = []
     for i in posts_info:
         chat = db_sess.query(Chat).get(int(i.comments_ids))
@@ -148,7 +151,7 @@ def main():
             commentcnt = chat.comments.split(",") if chat.comments else []
             likeBool = str(current_user.id) in i.likes_user_id.split(",") if i.likes_user_id else False
             posts.append(SupportPost(i, chat, len(commentcnt), likeBool, post_img=i.imgs.split(",") if i.imgs else None, user=user))
-    posts.reverse()
+    # posts.reverse()
     friend_requests = current_user.friends_requests
     friends_from_request = []
     if friend_requests:
