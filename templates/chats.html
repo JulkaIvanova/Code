@@ -14,7 +14,7 @@
                 </div>
                 <div class="friends-div">
                     {% for i in chats %}
-                        {% if i.comments %}
+                        {% if i.comments or not i.private_chat_with_friend%}
                         <div class="friend-info">
                             <div class="avatar-and-name-friend">
                                 <div style="border-radius: 20%;" class="friend-avatar-box">
