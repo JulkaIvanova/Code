@@ -118,7 +118,7 @@ def main():
             for file in files:
                 filename = secure_filename(file.filename)
                 post_img_filenames  = f"avatar_{uuid.uuid4()}_{filename}"
-                file.save(os.path.join('static\chat_avatars', post_img_filenames))
+                file.save(os.path.join(r'static\chat_avatars', post_img_filenames))
                 post_imgs_filenames.append(rf"..\static\chat_avatars\{post_img_filenames}".replace(",", '!'))
         print("++")  
         chat = Chat()
@@ -185,7 +185,7 @@ def likes():
             for file in files:
                 filename = secure_filename(file.filename)
                 post_img_filenames  = f"avatar_{uuid.uuid4()}_{filename}"
-                file.save(os.path.join('static\chat_avatars', post_img_filenames))
+                file.save(os.path.join(r'static\chat_avatars', post_img_filenames))
                 post_imgs_filenames.append(rf"..\static\chat_avatars\{post_img_filenames}".replace(",", '!'))
         print("++")  
         chat = Chat()
@@ -326,7 +326,7 @@ def id(Clientid):
             for file in files:
                 filename = secure_filename(file.filename)
                 post_img_filenames  = f"avatar_{uuid.uuid4()}_{filename}"
-                file.save(os.path.join('static\chat_avatars', post_img_filenames))
+                file.save(os.path.join(r'static\chat_avatars', post_img_filenames))
                 post_imgs_filenames.append(rf"..\static\chat_avatars\{post_img_filenames}".replace(",", '!'))
         print("++")  
         chat = Chat()
@@ -700,8 +700,8 @@ def settings():
                     if not user.img_avatar:
                         filename = secure_filename(file.filename)
                         avatar_filename = f"avatar_{uuid.uuid4()}_{filename}"
-                        file.save(os.path.join("static\chat_avatars", avatar_filename))
-                        avatar_filename = f"..\static\chat_avatars\{avatar_filename}"
+                        file.save(os.path.join(r"static\chat_avatars", avatar_filename))
+                        avatar_filename = rf"..\static\chat_avatars\{avatar_filename}"
                     else:
                         path = user.img_avatar
                         path = path[3::]
@@ -737,7 +737,7 @@ def settings():
                     if not user.img_profile:
                         filename = secure_filename(file.filename)
                         avatar_filename = f"avatar_{uuid.uuid4()}_{filename}"
-                        file.save(os.path.join("static\chat_avatars", avatar_filename))
+                        file.save(os.path.join(r"static\chat_avatars", avatar_filename))
                         avatar_filename = f"../static/chat_avatars/{avatar_filename}"
                     else:
                         path = os.path.join(*user.img_profile.split("/"))

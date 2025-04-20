@@ -41,6 +41,7 @@
                     </div>
                 </div>
                 {% block posts %}{% endblock %}
+
                 <script>
                     let contaner = document.getElementsByClassName('likes');
                     let flags = []
@@ -106,6 +107,7 @@
                         
                         let cntLikes = likeContaner.querySelector('span').innerText;
                         this.className = "bi bi-heart-fill";
+                    // TODO нужно проверять на повторный лайк
                         cntLikes = +cntLikes + 1;
                         likeContaner.querySelector('span').innerText = cntLikes;
                         

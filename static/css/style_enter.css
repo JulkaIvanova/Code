@@ -44,9 +44,7 @@ body {
     grid-area: 1 / 1;
 } */
 
-a{
-    text-decoration: none;
-}
+
 .button{
     font-size: 20px;
     width: 100%;

@@ -145,7 +145,7 @@ class LikeResource(Resource):
 
 class ChatResource(Resource):
     def __init__(self):
-        self.upload_folder = 'static\chat_avatars'
+        self.upload_folder = r'static\chat_avatars'
         self.max_size = 2 * 1024 * 1024  # 2MB
 
     def post(self):
@@ -168,7 +168,7 @@ class ChatResource(Resource):
                 filename = secure_filename(file.filename)
                 avatar_filename = f"avatar_{uuid.uuid4()}_{filename}"
                 file.save(os.path.join(self.upload_folder, avatar_filename))
-                avatar_filename = f"..\{self.upload_folder}\{avatar_filename}"
+                avatar_filename = rf"..\{self.upload_folder}\{avatar_filename}"
 
             # Обработка данных формы
             chat_name = request.form.get('chatName')
@@ -223,7 +223,7 @@ class ChatResource(Resource):
                 filename = secure_filename(file.filename)
                 avatar_filename = f"avatar_{uuid.uuid4()}_{filename}"
                 file.save(os.path.join(self.upload_folder, avatar_filename))
-                avatar_filename = f"..\{self.upload_folder}\{avatar_filename}"
+                avatar_filename = rf"..\{self.upload_folder}\{avatar_filename}"
 
             # Обновление данных чата
             chat_name = request.form.get('chatName')
