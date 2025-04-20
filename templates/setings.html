@@ -2,7 +2,7 @@
 {% block content %} 
     <div class="edit-profile-form">
         <h1 class="edit-title">Редактирование профиля</h1>
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
             {{ form2.hidden_tag() }}
             
             <div style="display: flex; flex-direction: row;">
@@ -37,7 +37,9 @@
                     </div>
                 </div>
             </div>
-            
+            {% if message %}
+                <div style="margin-top: 10px;" class="alert alert-danger" role="alert">{{ message }}</div>
+            {% endif %}
             <div style="border-top: 1px solid #3d3a3a; padding-top: 10px; margin-top: 30px;">
                 {{ form2.submit(class="submit") }}
             </div>

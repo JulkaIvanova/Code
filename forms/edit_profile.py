@@ -1,8 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, EmailField, PasswordField, IntegerField, SubmitField, FileField
-from wtforms import BooleanField
+from wtforms import StringField, IntegerField, SubmitField, FileField
 from wtforms.validators import DataRequired
-
+from flask_wtf.file import FileSize, FileAllowed
 
 class SettingsForm(FlaskForm):
     client_id = StringField('ID', render_kw={'readonly': True})

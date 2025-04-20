@@ -1,11 +1,21 @@
 
 {% extends "main.html" %}
 {% block posts %}
-    {% for i in range(cntBlocks) %}
+    {% for i in range(cntposts) %}
         <div class="wrapper-carousel">
-            <div id={{id[i][1::]}} class="carousel slide">
+            <div class="friend-item">
+                <div class="avatar-and-name-friend">
+                    <div class="friend-avatar-box-create-chat">
+                        <a href="/id/{{posts[i].user.id}}"><img class="friend-avatar-create-chat" {% if posts[i].user.img_avatar %} src="{{posts[i].user.img_avatar}}" {% else %} src="../static/img/avatar.jpg" {% endif %} alt=""></a>
+                    </div>
+                    <p style="margin-right: 10px; max-width: 450px; overflow: hidden;" class="name-friend-create-chat">{{posts[i].user.name}}</p>
+                    <p style="max-width: 450px; overflow: hidden;" class="name-friend-create-chat">{{posts[i].user.surname}}</p>
+                </div>
+            </div>
+            <div {% if not posts[i].post_img %} style="height: auto; overflow-wrap: break-word;" {% else %} style="overflow-wrap: break-word;" {% endif %} id=Post_{{posts[i].post.id}} class="carousel slide">
+                {% if posts[i].post_img %}
                 <div class="carousel-inner">
-                {% for img in imgs[i] %}
+                {% for img in posts[i].post_img %}
                     <div class="clear-fix adjust-img">
                         <div class="carousel-item active">
                             <img id="img" src={{img}} class="d-block w-100" alt="...">
@@ -13,34 +23,31 @@
                     </div>
                 {% endfor %}
                 </div>
-                <button class="carousel-control-prev" type="button" data-bs-target={{id[i]}} data-bs-slide="prev">
+                <button class="carousel-control-prev" type="button" data-bs-target=#Post_{{posts[i].post.id}} data-bs-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                     <span class="visually-hidden">Предыдущий</span>
                 </button>
-                <button class="carousel-control-next" type="button" data-bs-target={{id[i]}} data-bs-slide="next">
+                <button class="carousel-control-next" type="button" data-bs-target=#Post_{{posts[i].post.id}} data-bs-slide="next">
                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
                     <span class="visually-hidden">Следующий</span>
-                </button>            
+                </button>
+                {% endif %}            
             </div>
             <div class="caption">
-                <p><p>{{caption[i]}}</p></p>
+                <p><p>{{posts[i].post.caption}}</p></p>
             </div>
             <div style="display: flex; flex-direction: row; justify-content: space-between;">
                 <div class="likes-and-comments">
-                    {% if likesBool[i] == 1 %}
-                        <div data-bool={{likesBool[i]}} id={{i}} class="likes"><i class="bi bi-heart-fill"></i><span style="padding-left: 10px; width: 80%;">{{postCntLikes[i]}}</span></div>
-                    {% else %}
-                        <div data-bool={{likesBool[i]}} id={{i}} class="likes"><i class="bi bi-heart"></i><span style="padding-left: 10px; width: 80%;">{{postCntLikes[i]}}</span></div>
-                    {% endif%}
-                    <a style="display: block;" href="/chat/{{chat_id[i]}}"><div class="comments"><i class="bi bi-chat-left"></i><span style="padding-left: 10px;">{{postCntComments[i]}}</span></div></a>
+                    <div data-bool={{posts[i].likeBool}} id={{i}} class="likes"><i {% if posts[i].likeBool == 1 %} class="bi bi-heart-fill" {% else %} class="bi bi-heart" {% endif%}></i><span style="padding-left: 10px; width: 80%;">{{posts[i].post.likes}}</span></div>
+                    <a style="display: block;" href="/chat/{{posts[i].chat.id}}"><div class="comments"><i class="bi bi-chat-left"></i><span style="padding-left: 10px;">{{posts[i].commentcnt}}</span></div></a>
                 </div>
-                {% if postCreators[i] == current_user.id %}
+                {% if posts[i].post.creater == current_user.id %}
                     <div style="text-align: right;"><i onclick="event.stopPropagation()" class="more bi bi-three-dots-vertical"></i></div>
                 {% endif %}
             </div>
             <div class="edit-del" hidden>
-                <a href="/edit_post/{{ post_id[i] }}" class="item-edit-del edit-post"><i class="bi bi-pencil"></i><span style="padding-left: 10px;">Изменить пост</span></a>
-                <a data-del_id="{{ post_id[i] }}" id="del-post-link" class="item-edit-del del-post"><i class="bi bi-trash3"></i><span style="padding-left: 10px;">Удалить пост</span></a>
+                <a href="/edit_post/{{ posts[i].post.id }}" class="item-edit-del edit-post"><i class="bi bi-pencil"></i><span style="padding-left: 10px;">Изменить пост</span></a>
+                <a data-del_id="{{ posts[i].post.id }}" id="del-post-link" class="item-edit-del del-post"><i class="bi bi-trash3"></i><span style="padding-left: 10px;">Удалить пост</span></a>
             </div>
         </div>
     {% endfor %}
