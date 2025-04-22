@@ -38,22 +38,6 @@ body{
     left: 0; right: 0;
 }
 
-/* .logo{
-    position: absolute;
-    z-index: -1;
-    filter: grayscale(1);
-    opacity: 30%;
-    width: auto; height: 150%;
-    right: -200px; bottom: 0; top: 0;
-    margin: auto 0;
-} */
-
-/* .shaow ::before{
-    content: "jjjkjjjjjjjjjjjjjjjjj";
-    font-size: 70px;
-    color: lightgray;
-} */
-
 .block-with-content2{
     position: absolute;
     width: 500px; height: 500px;
@@ -73,16 +57,3 @@ body{
     width: 500px; height: 500px;
     margin: auto;
 }
-
-
-/* .block-with-content3{
-    position: absolute;
-    width: 500px; height: 500px;
-    top:25px; left: 55px;
-    z-index: -2;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-} */

@@ -325,7 +325,11 @@ def logout():
 def id(Clientid):
     if not current_user.is_authenticated:
         return redirect("/")
-    Clientid=int(Clientid)
+    try:
+        Clientid=int(Clientid)
+    except Exception as err:
+        print(err)
+        abort(404)
     form = SerchUserForm()
     createPostForm = CreatePostForm()
     db_sess = db_session.create_session()

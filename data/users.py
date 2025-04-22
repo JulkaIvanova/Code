@@ -31,7 +31,6 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     img_profile = sqlalchemy.Column(sqlalchemy.String)
     img_avatar = sqlalchemy.Column(sqlalchemy.String)
     sex = sqlalchemy.Column(sqlalchemy.String)
-    blocked_users = sqlalchemy.Column(sqlalchemy.String)
     private_chat_ids = sqlalchemy.Column(sqlalchemy.String)
     modified_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
 
