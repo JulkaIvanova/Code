@@ -80,16 +80,6 @@
         let password_repeat = document.getElementById("password_repeat")
         let email = document.getElementById("email")
 
-        // document.addEventListener('DOMContentLoaded', function() {
-        //     name.value = ""
-        //     surname.value = ""
-        //     city.value = ""
-        //     age.value = ""
-        //     sex.value = ""
-        //     password.value = NaN
-        //     password_repeat.value = NaN
-        //     email.value = NaN
-        // })
 
         let background_div = document.getElementById("authorithation")
         
@@ -106,11 +96,8 @@
         let title = document.getElementById("title");
 
         function set_contaner_2(e){
-            console.log(e)
             e.preventDefault();
-            console.log(name.value == "", surname.value == "")
             if (name.value == "" | surname.value == ""){
-                console.log("sssss")
                 if (name.value == ""){
                     name.style.border = 'solid red 1px'
                     setTimeout(function(){
@@ -134,24 +121,10 @@
             contaner_3.style.display = 'none';
             title.innerHTML = text_2;
         }
-        //recuared = true
-        // document.addEventListener('DOMContentLoaded', function() {
-        //     // Проверка видимости перед валидацией
-        //     function validateForm() {
-        //         const ageInput = document.querySelector('input[name="age"]');
-        //         if (ageInput.offsetParent === null) {
-        //             // Если поле скрыто, удаляем required
-        //             ageInput.removeAttribute('required');
-        //         }
-        //     }
-        // });
 
         function set_contaner_3(e){
             e.preventDefault();
-            console.log(+age.value)
-            console.log(isNaN(+age.value))
             if (isNaN(+age.value) | age.value < 0){
-                console.log('uuuuuu')
                 age.style.border = 'solid red 1px'
                 setTimeout(function(){
                     age.style.border = 'none'

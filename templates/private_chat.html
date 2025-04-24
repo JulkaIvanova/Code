@@ -2,7 +2,6 @@
 {% block content %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script> 
 <div style="min-width: 950px;" class="chat-container">
-    <!-- Боковая панель с информацией о чате -->
     <div class="chat-info-panel">
         <div class="chat-avatar-box">
             <img class="chat-avatar" src="{{chat_avatar}}" alt="Аватар чата">
@@ -25,7 +24,6 @@
         <a style="color: white; text-decoration: none;" href="/edit_private_chat/{{chat_id}}" class="edit-chat-info">Редактировать</a>
     </div>
 
-    <!-- Область сообщений -->
     <div class="messages-container">
         <div class="messages-list">
             {% for message in messages %}
@@ -44,7 +42,6 @@
             {% endfor %}
         </div>
         
-        <!-- Поле ввода сообщения -->
         <div class="message-input">
             <textarea class="message-textarea" placeholder="Введите сообщение..."></textarea>
             <button class="send-message">Отправить</button>
@@ -52,23 +49,19 @@
     </div>
 </div>
 <script>
-// Получаем основные элементы
 const chatInfoPanel = document.querySelector('.chat-info-panel');
 const editChatInfoButton = document.querySelector('.edit-chat-info');
 const messagesContainer = document.querySelector('.messages-container');
 const messageInput = document.querySelector('.message-textarea');
 const sendMessageButton = document.querySelector('.send-message');
 
-// Подключаемся к серверу WebSocket
 document.querySelector('.messages-list').scrollTo(0, document.querySelector('.messages-list').scrollHeight)
 const socket = io.connect('http://' + document.domain + ':' + location.port);
 
 const chatID = window.location.pathname.split('/private_chat/')[1];
 socket.emit('join_chat', { chat_id: chatID });
 
-// Получаем сообщения от сервера
 socket.on('message_from_server', function(data) {
-    console.log(data);
     const messages = document.querySelector('.messages-list');
     let a = document.querySelector("#avatar-img-heder-linck").href;
     let currentUserId = a.split("id/")[1];
@@ -91,10 +84,8 @@ socket.on('message_from_server', function(data) {
     messages.scrollTo(0, messages.scrollHeight)
 });
 
-// Обработчик отправки сообщения
 sendMessageButton.addEventListener('click', function() {
     const messageText = messageInput.value.trim();
-    console.log(messageText)
     if (messageText) {
         socket.emit('message_from_client', {text: messageText, chat_id: chatID})
         fetch('/api/send-message', {
@@ -126,25 +117,21 @@ sendMessageButton.addEventListener('click', function() {
         </div>
         `;
  
-        // Продолжаем предыдущий код
         messagesContainer.querySelector('.messages-list').insertAdjacentHTML('beforeend', newMessage);
 
-        // Прокручиваем до последнего сообщения
         document.querySelector('.messages-list').scrollTo(0, document.querySelector('.messages-list').scrollHeight)
 
-        messageInput.value = ''; // Очищаем поле ввода
+        messageInput.value = ''; 
         messageInput.focus();
         });
     }
 });
-// Обработчик ввода с клавиатуры
 messageInput.addEventListener('keyup', function(event) {
 if (event.key === 'Enter') {
 sendMessageButton.click();
 }
 });
 
-// Обработчик для автофокуса на поле ввода
 window.addEventListener('load', function() {
 messageInput.focus();
 });

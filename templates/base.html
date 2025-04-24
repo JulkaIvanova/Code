@@ -12,7 +12,6 @@
      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-        <!-- <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet"> -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
     <link rel="stylesheet" type="text/css" href="../static/css/style.css" />
     
@@ -29,14 +28,6 @@
                     <i class="bi bi-search serch-img"></i><!-- 
                     -->{{ form.serch_user_id(id="serch", class="serch", style="padding: 0px;", placeholder="Поиск") }}
                 </form>
-                <!-- <script>
-                    <input id="serch" class="serch" type="text" placeholder="Поиск">
-                    let form = document.getElementById('form')
-                    form.onsubmit = function(){
-                        let user_id = document.getElementById('serch').value
-                        form.action = '/id/' + user_id
-                    }
-                </script> -->
                 <div style="display: inline-block; position: relative;">
                     {% if  friends_from_request %}
                         <img style="position: absolute; top:3px; left: 14px; width: 8px;" src="../static/img/notice.png">
@@ -63,17 +54,13 @@
                         {% endif %}
                         <script>
                             let buttonsAccept = document.querySelectorAll('#put-request')
-                            console.log(buttonsAccept)
                             for (let i=0; i < buttonsAccept.length; i++){
-                                console.log(buttonsAccept[i])
                                 buttonsAccept[i].addEventListener('click', async (e) => {
-                                // e.preventDefault();
                                 try {
                                     const req_id = e.currentTarget.dataset.req_id
                                     const response = await fetch(`/accept_request/${req_id}`, { 
                                     method: 'POST',
                                     });
-                                    // Обработка ответа
                                 } catch (error) {
                                     console.error('Ошибка:', error);
                                 }
@@ -84,17 +71,13 @@
                         </script>
                         <script>
                             let buttonsReject = document.querySelectorAll('#del-request')
-                            console.log(buttonsReject)
                             for (let i=0; i < buttonsReject.length; i++){
-                                console.log(buttonsReject[i])
                                 buttonsReject[i].addEventListener('click', async (e) => {
-                                // e.preventDefault();
                                 try {
                                     const req_id = e.currentTarget.dataset.req_id
                                     const response = await fetch(`/reject_request/${req_id}`, { 
                                     method: 'POST',
                                     });
-                                    // Обработка ответа
                                 } catch (error) {
                                     console.error('Ошибка:', error);
                                 }
@@ -123,7 +106,6 @@
                         <a id="avatar-img-heder-linck" href={{ClientId}}><img class="avatar-img-heder" src="../static/img/avatar.jpg"></a>
                     {% endif %}
                 </div>
-                <!-- <a href={{ClientId}}><img class="icon-img-client" src="../static/img/avatar.jpg" height="30px"></a> -->
             </div>
         </div>
     </header>
@@ -169,7 +151,6 @@
                             location.reload()
                         }
 
-                        // При загрузке страницы проверяем текущий URL и выбираем соответствующую радиокнопку
                         document.addEventListener('DOMContentLoaded', function() {
                             const urlParams = new URLSearchParams(window.location.search);
                             const currentFilter = urlParams.get('filter');

@@ -72,7 +72,6 @@
                             }
         
                             const result = await response.json();
-                            console.log('Лайк сохранен:', result);
                         } catch (error) {
                             console.error('Ошибка:', error);
                         }
@@ -98,7 +97,6 @@
                         let currentPostId = currentPost.id;
                         let currentUserId = a.split("id/")[1];
         
-                        // Вызываем функцию отправки на сервер
                         sendLikeToServer(currentPostId, currentUserId, cntLikes);
                     }
                     let createPostButton = document.getElementById('createPost');
@@ -112,9 +110,6 @@
                             body.style.overflow = 'auto';
                             block.style.display = 'none';
                         });
-                        //setTimeout(()=>{
-                        //    
-                        //}, 0);
                     });
                     let addPanel = document.getElementsByClassName('more');
                     if (addPanel.length){
@@ -153,16 +148,14 @@
                     }
                     
                     function lookImg() {
-                        // Создаем контейнер для увеличенного изображения
                         let container = document.querySelector(".contaner_for_img");
                         container.innerHTML = '';
                         
-                        // Создаем увеличенное изображение с сохранением пропорций
                         let enlargedImg = new Image();
                         enlargedImg.src = this.src;
-                        enlargedImg.style.maxWidth = "90vw";  // 90% ширины экрана
-                        enlargedImg.style.maxHeight = "90vh"; // 90% высоты экрана
-                        enlargedImg.style.objectFit = "contain"; // сохраняет пропорции
+                        enlargedImg.style.maxWidth = "90vw";  
+                        enlargedImg.style.maxHeight = "90vh"; 
+                        enlargedImg.style.objectFit = "contain"; 
                         enlargedImg.style.position = "fixed";
                         enlargedImg.style.top = "50%";
                         enlargedImg.style.left = "50%";
@@ -170,7 +163,6 @@
                         enlargedImg.style.zIndex = "100000000";
                         
                         
-                        // Добавляем затемнение фона
                         let overlay = document.createElement("div");
                         overlay.style.position = "fixed";
                         overlay.style.top = "0";
@@ -181,7 +173,6 @@
                         overlay.style.zIndex = "99999999";
                         overlay.style.cursor = "zoom-out";
                         
-                        // Закрытие по клику на затемнение
                         overlay.addEventListener("click", function() {
                             document.body.removeChild(overlay);
                             document.body.removeChild(enlargedImg);

@@ -53,17 +53,13 @@
     {% endfor %}
     <script>
         let buttonsDel = document.querySelectorAll('#del-post-link')
-        console.log(buttonsDel)
         for (let i=0; i < buttonsDel.length; i++){
-            console.log(buttonsDel[i])
             buttonsDel[i].addEventListener('click', async (e) => {
-            // e.preventDefault();
             try {
                 const del_id = e.currentTarget.dataset.del_id
                 const response = await fetch(`/del_post/${del_id}`, { 
                 method: 'DELETE',
                 });
-                // Обработка ответа
             } catch (error) {
                 console.error('Ошибка:', error);
             }

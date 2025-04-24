@@ -12,7 +12,6 @@
          <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-            <!-- <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet"> -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
         <link rel="stylesheet" type="text/css" href="../static/css/style.css" />
         
@@ -21,7 +20,6 @@
 <body>
     <h1 style="text-align: center; color: white; margin-bottom: 20px; margin-top: 10px;">{% if members %}Редактирование чата{% else %}Создание чата{% endif %}</h1>
     <div class="create-chat-container">
-        <!-- Список друзей -->
         <div class="friends-list">
             <form style="position: static; top: 0; margin-bottom: 15px; width: 100%; display: flex; flex-direction: row;" class="serch-form" method="post" id="friend-form">
                 <i style="margin-left: 0;" class="bi bi-search serch-img"></i><!-- 
@@ -40,7 +38,6 @@
             {% endfor %}
         </div>
     
-        <!-- Панель создания чата -->
         <div class="chat-creation-panel">
             <div class="selected-friends">
                 <h3 style="text-align: left;">Участники чата</h3>
@@ -81,9 +78,7 @@
         <script>
             var chatID = window.location.href
             chatID = chatID.split("/edit_private_chat/")
-            console.log(chatID)
             chatID = chatID[1]
-            console.log(chatID)
             var type_request = 'PUT'
             var path = `/api/chats/edit/${chatID}`
         </script>
@@ -95,7 +90,6 @@
         </script>
     {% endif %}
     <script>
-        // Получаем основные элементы
 const friendsList = document.querySelector('.friends-list');
 const selectedFriendsList = document.querySelector('.selected-friends-list');
 const chatNameInput = document.querySelector('.chat-name');
@@ -109,19 +103,13 @@ friendsList.addEventListener('click', function(event) {alert("Нельзя из�
 </script>
 {% else %}
 <script>
-// Обработчик клика по друзьям
 friendsList.addEventListener('click', function(event) {
     const friendItem = event.target.closest('.friend-item');
     if (friendItem) {
         const friendId = friendItem.dataset.friendId;
         const friendAvatar = friendItem.querySelector('.friend-avatar-create-chat').src;
         const friendName = friendItem.querySelector('.name-friend-create-chat').textContent;
-        // function clousFriendSupport() {
-        //     selectedFriendsList.removeChild(selectedFriend);
-        // };
-        // Проверяем, не добавлен ли уже друг
         if (!selectedFriendsList.querySelector(`[data-friend-id="${friendId}"]`)) {
-            // Создаем элемент выбранного друга
             const selectedFriend = document.createElement('div');
             selectedFriend.classList.add('selected-friend');
             selectedFriend.dataset.friendId = friendId;
@@ -132,7 +120,6 @@ friendsList.addEventListener('click', function(event) {
                 <button class="remove-friend">&times;</button>
             `;
             
-            // Добавляем возможность удаления
             selectedFriend.querySelector('.remove-friend').addEventListener('click', function() {
                 selectedFriendsList.removeChild(selectedFriend);
             });
@@ -145,7 +132,6 @@ friendsList.addEventListener('click', function(event) {
 </script>
 {% endif %}
 <script>
-// Обработчик изменения аватара чата
 chatAvatarInput.addEventListener('change', function(event) {
     const file = event.target.files[0];
     if (file) {
@@ -165,42 +151,20 @@ async function createChat(data) {
         formData.append('chatName', data.chatName);
         formData.append('friends', JSON.stringify(data.friends));
         
-        // Ключевое изменение - добавляем файл с правильным именем
         if (data.avatar) {
-            formData.append('avatar_file', data.avatar); // Явно указываем имя поля для файла
-            console.log('Файл для отправки:', {
-                name: data.avatar.name,
-                size: data.avatar.size,
-                type: data.avatar.type
-            });
+            formData.append('avatar_file', data.avatar); 
         }
-        console.log(path)
-        // Отладочная информация
-        console.log('Отправляемые данные FormData:');
-        for (let [key, value] of formData.entries()) {
-            console.log(key, value);
-        }
-
-        console.log('====================================')
 
         const response = await fetch(path, {
             method: type_request,
             body: formData
-            // Не устанавливаем Content-Type вручную!
         });
 
-        console.log('===');
-        console.log(response);
 
         if (!response.ok) {
-            console.log("bug")
             return
-            // const error = await response.json();
-            // throw new Error(error.message || 'Ошибка сервера');
         }
-        console.log("OK")
         const result = await response.json();
-        console.log('Ответ сервера:', result);
         window.location.href = `/chats`;
         
     } catch (error) {
@@ -209,7 +173,6 @@ async function createChat(data) {
     }
 }
 
-// Модифицированный обработчик кнопки
 createChatButton.addEventListener('click', function() {
     const data = {
         chatName: chatNameInput.value,
@@ -225,7 +188,6 @@ createChatButton.addEventListener('click', function() {
     createChat(data);
 });
 
-// Инициализация превью аватара
 if (chatAvatarPreview) {
     chatAvatarPreview.style.width = '150px';
     chatAvatarPreview.style.height = '150px';
@@ -250,7 +212,6 @@ searchInput.addEventListener('input', function(event) {
         let name_elements = all_friends[i].getElementsByClassName("name-friend-create-chat");
         let fullName = "";
 
-        // Собираем полное имя из всех элементов с классом name-friend
         for (let j = 0; j < name_elements.length; j++) {
             fullName += name_elements[j].textContent + " ";
         }

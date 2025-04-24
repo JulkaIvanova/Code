@@ -24,17 +24,13 @@
                 </div>
                 <script>
                     let buttons = document.querySelectorAll('#del-friend')
-                    console.log(buttons)
                     for (let i=0; i < buttons.length; i++){
-                        console.log(buttons[i])
                         buttons[i].addEventListener('click', async (e) => {
-                        // e.preventDefault();
                         try {
                             const friend_id = e.currentTarget.dataset.friend_id
                             const response = await fetch(`/delete_friend/${friend_id}`, { 
                             method: 'DELETE',
                             });
-                            // Обработка ответа
                         } catch (error) {
                             console.error('Ошибка:', error);
                         }
@@ -58,7 +54,6 @@
                             let name_elements = all_friends[i].getElementsByClassName("name-friend");
                             let fullName = "";
                     
-                            // Собираем полное имя из всех элементов с классом name-friend
                             for (let j = 0; j < name_elements.length; j++) {
                                 fullName += name_elements[j].textContent + " ";
                             }
