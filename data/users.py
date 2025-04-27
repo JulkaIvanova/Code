@@ -34,10 +34,8 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     private_chat_ids = sqlalchemy.Column(sqlalchemy.String)
     modified_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
 
-
     comments = orm.relationship("Comments", back_populates='user')
     posts = orm.relationship("Posts", back_populates='user')
-    # chats = orm.relationship("Chat", back_populates='user')
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)

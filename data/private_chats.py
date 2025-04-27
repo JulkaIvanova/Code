@@ -9,7 +9,6 @@ class PrivateChat(SqlAlchemyBase, SerializerMixin):
     __tablename__ = "private_chats"
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
-    # messeges = sqlalchemy.Column(sqlalchemy.String)
     members = sqlalchemy.Column(sqlalchemy.String)
     chat_name = sqlalchemy.Column(sqlalchemy.String)
     chat_avatar = sqlalchemy.Column(sqlalchemy.String)

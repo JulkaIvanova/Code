@@ -19,7 +19,7 @@ def sort_posts_by_user_likes(user: User, posts: List[Posts]) -> List[Posts]:
     category_fields = {
         'guide': user.post_like_guide_category_ids,
         'ideas': user.post_like_ideas_category_ids,
-        'mems':  user.post_like_mems_category_ids,
+        'mems': user.post_like_mems_category_ids,
         'all': user.post_like_common_category_ids,
     }
     counts = {cat: len(parse_ids(ids)) for cat, ids in category_fields.items()}

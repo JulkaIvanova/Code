@@ -21,8 +21,4 @@ class Posts(SqlAlchemyBase, SerializerMixin):
         sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id")
     )
     likes_user_id = sqlalchemy.Column(sqlalchemy.String)
-    # coments = orm.relationship("Comments", back_populates='post')
     user = orm.relationship("User")
-
-
-

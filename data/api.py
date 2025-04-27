@@ -66,7 +66,6 @@ class LikeResource(Resource):
             user_likes = user.post_like_ids
             post_likes_count = db_sess.query(Posts).get(post_id).likes
 
-
             if user_likes is not None or user_likes == "":
                 user_likes = user_likes.split(',')
 

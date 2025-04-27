@@ -1,9 +1,11 @@
 from markupsafe import Markup
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, IntegerField, SelectField, RadioField, PasswordField, EmailField, FileField, TextAreaField
+from wtforms import StringField, SubmitField, IntegerField, SelectField, RadioField, PasswordField, EmailField, \
+    FileField, TextAreaField
 from wtforms.validators import DataRequired
-from wtforms.widgets import ListWidget, html_params,RadioInput
+from wtforms.widgets import ListWidget, html_params, RadioInput
 from flask_wtf.file import FileSize, FileAllowed, MultipleFileField
+
 
 class CastomListWidget(ListWidget):
 
@@ -13,9 +15,9 @@ class CastomListWidget(ListWidget):
         for subfield in field:
             html.append(f"<div id='category'>{subfield()}<span class='radio-label'>{subfield.label}</span></div>")
         return Markup("".join(html))
-    
-class CustomRadioField(RadioField):
 
+
+class CustomRadioField(RadioField):
     widget = CastomListWidget()
     option_widget = RadioInput()
 

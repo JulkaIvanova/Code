@@ -29,30 +29,35 @@ from flask_restful import Api
 from data.custom_recommendations_new import *
 from data.custom_sorted_posts_new import *
 
+
 class SupportPost:
-        def __init__(self, post, chat, commentcnt, likeBool, post_img, user):
-            self.post = post
-            self.chat = chat
-            self.commentcnt = commentcnt
-            self.likeBool = likeBool
-            self.post_img = post_img
-            self.user = user
+    def __init__(self, post, chat, commentcnt, likeBool, post_img, user):
+        self.post = post
+        self.chat = chat
+        self.commentcnt = commentcnt
+        self.likeBool = likeBool
+        self.post_img = post_img
+        self.user = user
+
 
 class SupportFriend:
-        def __init__(self, friend, chat_id):
-            self.friend=friend
-            self.chat_id = chat_id
+    def __init__(self, friend, chat_id):
+        self.friend = friend
+        self.chat_id = chat_id
+
 
 class Message:
-        def __init__(self, text, author, time, is_mine, avatar):
-            self.text = text
-            self.author = author
-            self.time = time
-            self.is_mine = is_mine
-            self.avatar = avatar
+    def __init__(self, text, author, time, is_mine, avatar):
+        self.text = text
+        self.author = author
+        self.time = time
+        self.is_mine = is_mine
+        self.avatar = avatar
+
 
 def allowed_file(filename, allowed_extensions={'png', 'jpg', 'jpeg', 'gif'}):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
+
 
 app = f.Flask(__name__)
 socketio = SocketIO(app)
@@ -72,10 +77,11 @@ def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
 
+
 @app.route("/create_accaunt", methods=["GET", "POST"])
 def form():
     form = Registration()
-    
+
     if form.validate_on_submit():
         if form.password.data != form.password_repeat.data:
             return render_template(
@@ -119,10 +125,10 @@ def main():
             files = createPostForm.imgs.data
             for file in files:
                 filename = secure_filename(file.filename)
-                post_img_filenames  = f"avatar_{uuid.uuid4()}_{filename}"
+                post_img_filenames = f"avatar_{uuid.uuid4()}_{filename}"
                 file.save(os.path.join('static\chat_avatars', post_img_filenames))
                 post_imgs_filenames.append(rf"..\static\chat_avatars\{post_img_filenames}".replace(",", '!'))
-        print("++")  
+        print("++")
         chat = Chat()
         db_sess.add(chat)
         db_sess.commit()
@@ -131,9 +137,9 @@ def main():
             caption=createPostForm.caption.data,
             imgs=",".join(post_imgs_filenames),
             category=createPostForm.category.data,
-            comments_ids = chat.id,
-            creater = current_user.id,
-            likes = 0,    
+            comments_ids=chat.id,
+            creater=current_user.id,
+            likes=0,
         )
         db_sess.add(post)
         db_sess.commit()
@@ -157,7 +163,8 @@ def main():
         if chat and user:
             commentcnt = chat.comments.split(",") if chat.comments else []
             likeBool = str(current_user.id) in i.likes_user_id.split(",") if i.likes_user_id else False
-            posts.append(SupportPost(i, chat, len(commentcnt), likeBool, post_img=i.imgs.split(",") if i.imgs else None, user=user))
+            posts.append(SupportPost(i, chat, len(commentcnt), likeBool, post_img=i.imgs.split(",") if i.imgs else None,
+                                     user=user))
     # posts.reverse()
     friend_requests = current_user.friends_requests
     friends_from_request = []
@@ -166,15 +173,15 @@ def main():
             friends_from_request.append(db_sess.query(User).filter(User.id == int(i)).first())
             friends_from_request.append(db_sess.query(User).filter(User.id == int(i)).first())
     html = f.render_template(r"post_block_main.html",
-                             createPostForm = createPostForm, 
-                            form=form, 
-                            ClientId=f'id/{current_user.id}',  
-                            posts=posts,
-                            cntposts = len(posts),
-                            friends_from_request = friends_from_request,
-                            seeFilter = True,
-                            )
-    
+                             createPostForm=createPostForm,
+                             form=form,
+                             ClientId=f'id/{current_user.id}',
+                             posts=posts,
+                             cntposts=len(posts),
+                             friends_from_request=friends_from_request,
+                             seeFilter=True,
+                             )
+
     return html
 
 
@@ -193,10 +200,10 @@ def likes():
             files = createPostForm.imgs.data
             for file in files:
                 filename = secure_filename(file.filename)
-                post_img_filenames  = f"avatar_{uuid.uuid4()}_{filename}"
+                post_img_filenames = f"avatar_{uuid.uuid4()}_{filename}"
                 file.save(os.path.join('static\chat_avatars', post_img_filenames))
                 post_imgs_filenames.append(rf"..\static\chat_avatars\{post_img_filenames}".replace(",", '!'))
-        print("++")  
+        print("++")
         chat = Chat()
         db_sess.add(chat)
         db_sess.commit()
@@ -205,9 +212,9 @@ def likes():
             caption=createPostForm.caption.data,
             imgs=",".join(post_imgs_filenames),
             category=createPostForm.category.data,
-            comments_ids = chat.id,
-            creater = current_user.id,
-            likes = 0,    
+            comments_ids=chat.id,
+            creater=current_user.id,
+            likes=0,
         )
         db_sess.add(post)
         db_sess.commit()
@@ -231,7 +238,9 @@ def likes():
             if in_likes:
                 commentcnt = chat.comments.split(",") if chat.comments else []
                 likeBool = str(current_user.id) in i.likes_user_id.split(",") if i.likes_user_id else False
-                posts.append(SupportPost(i, chat, len(commentcnt), likeBool, post_img=i.imgs.split(",") if i.imgs else None, user=user))
+                posts.append(
+                    SupportPost(i, chat, len(commentcnt), likeBool, post_img=i.imgs.split(",") if i.imgs else None,
+                                user=user))
     # posts.reverse()
     friend_requests = current_user.friends_requests
     friends_from_request = []
@@ -239,14 +248,14 @@ def likes():
         for i in friend_requests.split(","):
             friends_from_request.append(db_sess.query(User).filter(User.id == int(i)).first())
     html = f.render_template(r"post_block_likes.html",
-                            createPostForm = createPostForm, 
-                            form=form, 
-                            ClientId=f'id/{current_user.id}',  
-                            posts=posts,
-                            cntposts = len(posts),
-                            friends_from_request = friends_from_request,
-                            seeFilter = True,
-                            )
+                             createPostForm=createPostForm,
+                             form=form,
+                             ClientId=f'id/{current_user.id}',
+                             posts=posts,
+                             cntposts=len(posts),
+                             friends_from_request=friends_from_request,
+                             seeFilter=True,
+                             )
     return html
 
 
@@ -279,23 +288,24 @@ def friends():
             print(user_chat_ids)
             print(cur_chat_ids)
             chat = db_sess.query(PrivateChat).filter(
-            and_(
-            PrivateChat.private_chat_with_friend == True,
-            PrivateChat.id.in_(cur_chat_ids), 
-            PrivateChat.id.in_(user_chat_ids)
-            )
+                and_(
+                    PrivateChat.private_chat_with_friend == True,
+                    PrivateChat.id.in_(cur_chat_ids),
+                    PrivateChat.id.in_(user_chat_ids)
+                )
             ).first()
             if chat:
                 chat_id = chat.id
         if chat_id > 0:
             user_friends.append(SupportFriend(i, chat_id))
-    html = f.render_template(r"friends.html", 
-                            form=form,
-                            ClientId = f'/id/{current_user.id}', 
-                            friends=user_friends,
-                            friends_from_request = friends_from_request,
-                            seeFilter = False)
+    html = f.render_template(r"friends.html",
+                             form=form,
+                             ClientId=f'/id/{current_user.id}',
+                             friends=user_friends,
+                             friends_from_request=friends_from_request,
+                             seeFilter=False)
     return html
+
 
 @app.route("/", methods=["GET", "POST"])
 def login():
@@ -321,12 +331,13 @@ def logout():
     logout_user()
     return redirect("/")
 
+
 @app.route("/id/<Clientid>", methods=["POST", "GET"])
 def id(Clientid):
     if not current_user.is_authenticated:
         return redirect("/")
     try:
-        Clientid=int(Clientid)
+        Clientid = int(Clientid)
     except Exception as err:
         print(err)
         abort(404)
@@ -344,10 +355,10 @@ def id(Clientid):
             files = createPostForm.imgs.data
             for file in files:
                 filename = secure_filename(file.filename)
-                post_img_filenames  = f"avatar_{uuid.uuid4()}_{filename}"
+                post_img_filenames = f"avatar_{uuid.uuid4()}_{filename}"
                 file.save(os.path.join('static\chat_avatars', post_img_filenames))
                 post_imgs_filenames.append(rf"..\static\chat_avatars\{post_img_filenames}".replace(",", '!'))
-        print("++")  
+        print("++")
         chat = Chat()
         db_sess.add(chat)
         db_sess.commit()
@@ -356,9 +367,9 @@ def id(Clientid):
             caption=createPostForm.caption.data,
             imgs=",".join(post_imgs_filenames),
             category=createPostForm.category.data,
-            comments_ids = chat.id,
-            creater = current_user.id,
-            likes = 0,    
+            comments_ids=chat.id,
+            creater=current_user.id,
+            likes=0,
         )
         db_sess.add(post)
         db_sess.commit()
@@ -379,7 +390,8 @@ def id(Clientid):
         if chat and int(i.creater) == user.id:
             commentcnt = chat.comments.split(",") if chat.comments else []
             likeBool = str(current_user.id) in i.likes_user_id.split(",") if i.likes_user_id else False
-            posts.append(SupportPost(i, chat, len(commentcnt), likeBool, post_img=i.imgs.split(",") if i.imgs else None, user=user))
+            posts.append(SupportPost(i, chat, len(commentcnt), likeBool, post_img=i.imgs.split(",") if i.imgs else None,
+                                     user=user))
     # posts.reverse()
     friend_requests = current_user.friends_requests
     current_friends = current_user.friends_ids
@@ -400,11 +412,11 @@ def id(Clientid):
         print(user_chat_ids)
         print(cur_chat_ids)
         chat = db_sess.query(PrivateChat).filter(
-        and_(
-        PrivateChat.private_chat_with_friend == True,
-        PrivateChat.id.in_(cur_chat_ids), 
-        PrivateChat.id.in_(user_chat_ids)
-        )
+            and_(
+                PrivateChat.private_chat_with_friend == True,
+                PrivateChat.id.in_(cur_chat_ids),
+                PrivateChat.id.in_(user_chat_ids)
+            )
         ).first()
         if chat:
             chat_id = chat.id
@@ -412,26 +424,22 @@ def id(Clientid):
     ClientId = f"/id/{current_user.id}"
     html = f.render_template(
         r"post_block.html",
-        createPostForm = createPostForm,
+        createPostForm=createPostForm,
         form=form,
-        serch_user = Clientid,
+        serch_user=Clientid,
         ClientId=ClientId,
-        
+
         user=user,
         posts=posts,
-        cntposts = len(posts),
+        cntposts=len(posts),
 
         user_chat_id=chat_id,
-        friends_from_request = friends_from_request,
-        serch_user_in_friends = str(Clientid) in friends,
-        serch_user_in_friend_requests = str(Clientid) in friend_requests,
-        seeFilter = True
+        friends_from_request=friends_from_request,
+        serch_user_in_friends=str(Clientid) in friends,
+        serch_user_in_friend_requests=str(Clientid) in friend_requests,
+        seeFilter=True
     )
     return html
-
-
-
-
 
 
 @app.route("/create_chat", methods=["GET", "POST"])
@@ -449,7 +457,6 @@ def create_chat():
             friends.append(db_sess.query(User).filter(User.id == int(i)).first())
     html = f.render_template(r"create_chat.html", friends=friends)
     return html
-    
 
 
 @app.route("/edit_private_chat/<chat_id>", methods=["GET", "POST"])
@@ -481,13 +488,13 @@ def edit_chat(chat_id):
     chat_avatar = rf"..\static\img\chat.png"
     if private_chat.chat_avatar:
         chat_avatar = private_chat.chat_avatar
-    html = f.render_template(r"create_chat.html", 
-                            friends = friends,
-                            members = members,
-                            chat_type=chat.private_chat_with_friend,
-                            chat_avatar = chat_avatar,
-                            chat_name = chat.chat_name
-                            )
+    html = f.render_template(r"create_chat.html",
+                             friends=friends,
+                             members=members,
+                             chat_type=chat.private_chat_with_friend,
+                             chat_avatar=chat_avatar,
+                             chat_name=chat.chat_name
+                             )
     return html
 
 
@@ -515,7 +522,8 @@ def private_chat(id):
         for i in message_id:
             message = db_sess.query(Comments).filter(Comments.id == int(i)).first()
             user = db_sess.query(User).filter(User.id == message.sender).first()
-            messages.append(Message(message.text, user.name, str(message.send_date).split(".")[0], message.sender == current_user.id, user.img_avatar))
+            messages.append(Message(message.text, user.name, str(message.send_date).split(".")[0],
+                                    message.sender == current_user.id, user.img_avatar))
     chat_avatar = rf"..\static\img\chat.png"
     if private_chat.chat_avatar:
         chat_avatar = private_chat.chat_avatar
@@ -525,21 +533,23 @@ def private_chat(id):
         for i in friend_requests.split(","):
             friends_from_request.append(db_sess.query(User).filter(User.id == int(i)).first())
     html = f.render_template("private_chat.html",
-                             chat_id = int(id),
-                            chat_avatar=chat_avatar,
-                            chat_name=private_chat.chat_name,
-                            chat_participants = users,
-                            messages = messages,
-                            form = form,
-                            ClientId = f'/id/{current_user.id}',
-                            friends_from_request = friends_from_request,
-                            seeFilter = False)
+                             chat_id=int(id),
+                             chat_avatar=chat_avatar,
+                             chat_name=private_chat.chat_name,
+                             chat_participants=users,
+                             messages=messages,
+                             form=form,
+                             ClientId=f'/id/{current_user.id}',
+                             friends_from_request=friends_from_request,
+                             seeFilter=False)
     return html
+
 
 @socketio.on('join_chat')
 def handle_join_chat(data):
     chat_id = data['chat_id']
     join_room(f'chat_{chat_id}')
+
 
 @socketio.on('message_from_client')
 def handle_message(data):
@@ -574,20 +584,20 @@ def chat(id):
         comment = db_sess.query(Comments).get(int(i))
         if comment:
             user = db_sess.query(User).filter(User.id == comment.sender).first()
-            comments.append(Message(comment.text, user.name, str(comment.send_date).split(".")[0], comment.sender == current_user.id, user.img_avatar))
+            comments.append(Message(comment.text, user.name, str(comment.send_date).split(".")[0],
+                                    comment.sender == current_user.id, user.img_avatar))
     friend_requests = current_user.friends_requests
     friends_from_request = []
     if friend_requests:
         for i in friend_requests.split(","):
             friends_from_request.append(db_sess.query(User).filter(User.id == int(i)).first())
     html = f.render_template("chat.html",
-                            messages = comments,
-                            form = form,
-                            ClientId = f'/id/{current_user.id}',
-                            friends_from_request = friends_from_request,
-                            seeFilter = False)
+                             messages=comments,
+                             form=form,
+                             ClientId=f'/id/{current_user.id}',
+                             friends_from_request=friends_from_request,
+                             seeFilter=False)
     return html
-
 
 
 @app.route("/chats", methods=["GET", "POST"])
@@ -611,12 +621,12 @@ def chats():
     if friend_requests:
         for i in friend_requests.split(","):
             friends_from_request.append(db_sess.query(User).filter(User.id == int(i)).first())
-    html = f.render_template(r"chats.html", 
-                            form=form,
-                            ClientId = f'/id/{current_user.id}', 
-                            chats=chats,
-                            friends_from_request = friends_from_request,
-                            seeFilter = False)
+    html = f.render_template(r"chats.html",
+                             form=form,
+                             ClientId=f'/id/{current_user.id}',
+                             chats=chats,
+                             friends_from_request=friends_from_request,
+                             seeFilter=False)
     return html
 
 
@@ -644,20 +654,20 @@ def edit_post(post_id):
             for i in friend_requests.split(","):
                 friends_from_request.append(db_sess.query(User).filter(User.id == int(i)).first())
         return render_template("edit_post.html", createPostForm=form1, post_id=post_id, form=form,
-                            ClientId = f'/id/{current_user.id}',
-                            friends_from_request = friends_from_request,
-                            seeFilter = False )
+                               ClientId=f'/id/{current_user.id}',
+                               friends_from_request=friends_from_request,
+                               seeFilter=False)
     elif request.method == "POST":
         if form1.validate_on_submit():
             try:
-                #нужно внести изменения в БД (а имено изменени описание. Здесь можно редактировать только его)
+                # нужно внести изменения в БД (а имено изменени описание. Здесь можно редактировать только его)
                 post.caption = form1.caption.data
                 db_sess.commit()
                 return redirect("/main")
             except Exception as e:
                 print(e)
                 abort(402)
-        #здесь нужно придумать как будет обрабатывать случай если пользователь ввёл что либо не коректно
+        # здесь нужно придумать как будет обрабатывать случай если пользователь ввёл что либо не коректно
 
 
 @app.route("/settings", methods=["GET", "POST"])
@@ -683,14 +693,14 @@ def settings():
         form2.surname.data = surname
         form2.age.data = age
         form2.client_id.data = current_user.id
-        
+
         return render_template(
             "setings.html",
             form=form,
             ClientId=f"/id/{current_user.id}",
             form2=form2,
-            friends_from_request = friends_from_request,
-            seeFilter = False
+            friends_from_request=friends_from_request,
+            seeFilter=False
         )
     elif request.method == "POST":
         if form2.validate_on_submit():
@@ -704,36 +714,36 @@ def settings():
                         form=form,
                         ClientId=f"/id/{current_user.id}",
                         form2=form2,
-                        friends_from_request = friends_from_request,
-                        seeFilter = False,
-                        message = "Возраст не может быть отрицательным!!!"
+                        friends_from_request=friends_from_request,
+                        seeFilter=False,
+                        message="Возраст не может быть отрицательным!!!"
                     )
                 # Обработка файлов
                 if form2.avatar.data:
                     file = form2.avatar.data
-                
+
                     if file.content_length > 2 * 1024 * 1024:
                         return render_template(
                             "setings.html",
                             form=form,
                             ClientId=f"/id/{current_user.id}",
                             form2=form2,
-                            friends_from_request = friends_from_request,
-                            seeFilter = False,
-                            message = "Слишком большой файл!!!"
+                            friends_from_request=friends_from_request,
+                            seeFilter=False,
+                            message="Слишком большой файл!!!"
                         )
-                    
+
                     if not allowed_file(file.filename):
                         return render_template(
                             "setings.html",
                             form=form,
                             ClientId=f"/id/{current_user.id}",
                             form2=form2,
-                            friends_from_request = friends_from_request,
-                            seeFilter = False,
-                            message = "Недопустимый формат!!!"
+                            friends_from_request=friends_from_request,
+                            seeFilter=False,
+                            message="Недопустимый формат!!!"
                         )
-                    
+
                     if not user.img_avatar:
                         filename = secure_filename(file.filename)
                         avatar_filename = f"avatar_{uuid.uuid4()}_{filename}"
@@ -748,27 +758,27 @@ def settings():
 
                 if form2.background.data:
                     file = form2.background.data
-                
+
                     if file.content_length > 2 * 1024 * 1024:
                         return render_template(
                             "setings.html",
                             form=form,
                             ClientId=f"/id/{current_user.id}",
                             form2=form2,
-                            friends_from_request = friends_from_request,
-                            seeFilter = False,
-                            message = "Слишком большой файл!!!"
+                            friends_from_request=friends_from_request,
+                            seeFilter=False,
+                            message="Слишком большой файл!!!"
                         )
-                    
+
                     if not allowed_file(file.filename):
                         return render_template(
                             "setings.html",
                             form=form,
                             ClientId=f"/id/{current_user.id}",
                             form2=form2,
-                            friends_from_request = friends_from_request,
-                            seeFilter = False,
-                            message = "Недопустимый формат!!!"
+                            friends_from_request=friends_from_request,
+                            seeFilter=False,
+                            message="Недопустимый формат!!!"
                         )
                     if not user.img_profile:
                         filename = secure_filename(file.filename)
@@ -783,32 +793,32 @@ def settings():
                         file.save(path)
                         avatar_filename = user.img_profile
                     user.img_profile = avatar_filename
-                user.name=form2.name.data
-                user.surname=form2.surname.data
-                user.age=form2.age.data
+                user.name = form2.name.data
+                user.surname = form2.surname.data
+                user.age = form2.age.data
                 db_sess.commit()
                 return redirect(f"/id/{current_user.id}")
 
             except Exception as e:
                 print(e)
                 return render_template(
-                            "setings.html",
-                            form=form,
-                            ClientId=f"/id/{current_user.id}",
-                            form2=form2,
-                            friends_from_request = friends_from_request,
-                            seeFilter = False,
-                            message = "Что-то пошло не так"
-                        )
+                    "setings.html",
+                    form=form,
+                    ClientId=f"/id/{current_user.id}",
+                    form2=form2,
+                    friends_from_request=friends_from_request,
+                    seeFilter=False,
+                    message="Что-то пошло не так"
+                )
         print("k")
         return render_template(
             "setings.html",
             form=form,
             ClientId=f"/id/{current_user.id}",
             form2=form2,
-            friends_from_request = friends_from_request,
-            seeFilter = False,
-            message = "Что-то пошло не так"
+            friends_from_request=friends_from_request,
+            seeFilter=False,
+            message="Что-то пошло не так"
         )
 
 
