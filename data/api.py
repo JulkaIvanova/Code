@@ -14,17 +14,6 @@ from flask_login import current_user
 from sqlalchemy import and_
 
 
-# class CheckLoginResource(Resource):
-#     def post(self):
-#         # Проверка авторизации
-#         if not current_user.is_authenticated:
-#             return {"error": "Требуется авторизация"}, 401
-
-#         # current_user теперь доступен
-#         print(f"User ID: {current_user.id}, Name: {current_user.name}")
-#         return {"status": "success"}
-
-# Общие функции
 def allowed_file(filename, allowed_extensions={'png', 'jpg', 'jpeg', 'gif'}):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
@@ -34,7 +23,6 @@ def extract_numbers(text):
     return ','.join(numbers)
 
 
-# Парсеры для запросов
 like_parser = reqparse.RequestParser()
 like_parser.add_argument('postId', required=True)
 like_parser.add_argument('userId', required=True)
@@ -46,20 +34,15 @@ message_parser.add_argument('type', required=True)
 message_parser.add_argument('chatID', required=True)
 
 
-# Ресурсы API
 class LikeResource(Resource):
     def post(self):
         if not current_user.is_authenticated:
             return {"error": "Требуется авторизация"}, 401
-        print("hhhh")
         args = like_parser.parse_args()
         db_sess = db_session.create_session()
         try:
-            print(f"Получен лайк: Пост {args['postId']}, Пользователь {args['userId']}, Лайков: {args['likesCount']}")
             post_id = args['postId'][5:]
-            print(post_id)
             user_id = args['userId']
-            print(user_id)
             post_category = db_sess.query(Posts).get(post_id).category
             user = db_sess.query(User).get(user_id)
             post_likes = db_sess.query(Posts).get(post_id).likes_user_id
@@ -145,7 +128,7 @@ class LikeResource(Resource):
 class ChatResource(Resource):
     def __init__(self):
         self.upload_folder = 'static\chat_avatars'
-        self.max_size = 2 * 1024 * 1024  # 2MB
+        self.max_size = 2 * 1024 * 1024
 
     def post(self):
         if not current_user.is_authenticated:
@@ -153,7 +136,6 @@ class ChatResource(Resource):
         try:
             db_sess = db_session.create_session()
 
-            # Обработка файла
             avatar_filename = None
             if 'avatar_file' in request.files:
                 file = request.files['avatar_file']
@@ -169,14 +151,12 @@ class ChatResource(Resource):
                 file.save(os.path.join(self.upload_folder, avatar_filename))
                 avatar_filename = f"..\{self.upload_folder}\{avatar_filename}"
 
-            # Обработка данных формы
             chat_name = request.form.get('chatName')
             friends = request.form.get('friends')
 
             if not chat_name or not friends:
                 abort(400, message="Не хватает данных")
 
-            # Создание чата
             chat = PrivateChat(
                 members=f"{extract_numbers(friends)},{current_user.id}",
                 chat_name=chat_name,
@@ -208,7 +188,6 @@ class ChatResource(Resource):
             if not chat:
                 abort(404, message="Чат не найден")
 
-            # Обработка файла
             avatar_filename = None
             if 'avatar_file' in request.files:
                 file = request.files['avatar_file']
@@ -224,7 +203,6 @@ class ChatResource(Resource):
                 file.save(os.path.join(self.upload_folder, avatar_filename))
                 avatar_filename = f"..\{self.upload_folder}\{avatar_filename}"
 
-            # Обновление данных чата
             chat_name = request.form.get('chatName')
             friends = request.form.get('friends')
 
@@ -251,11 +229,8 @@ class ChatResource(Resource):
             if not chat or chat.private_chat_with_friend:
                 return {'status': 'error', 'message': 'Чат не найден'}, 404
             members = chat.members.split(",")
-            print("++++++++++++++++++++++")
             if str(current_user.id) not in members:
-                print("********************************")
                 return {'status': 'error', 'message': 'Чат не найден'}, 404
-            print("___________________________________")
             session.delete(chat)
             session.commit()
             for i in members:
@@ -279,7 +254,6 @@ class MessageResource(Resource):
         try:
             db_sess = db_session.create_session()
 
-            # Создание сообщения
             comment = Comments(
                 chat_id=args['chatID'],
                 text=args['text'],
@@ -289,14 +263,12 @@ class MessageResource(Resource):
             db_sess.add(comment)
             db_sess.commit()
 
-            # Обновление чата
             chat = db_sess.query(PrivateChat).get(args['chatID']) if comment.type == "private" else db_sess.query(
                 Chat).get(args['chatID'])
             if chat:
                 chat.comments = f"{chat.comments},{comment.id}" if chat.comments else str(comment.id)
                 db_sess.commit()
 
-            # Обновление пользователя
             user = db_sess.query(User).get(current_user.id)
             if user:
                 user.comment_ids = f"{user.comment_ids},{comment.id}" if user.comment_ids else str(comment.id)
@@ -325,29 +297,22 @@ class AddFriendResource(Resource):
         if not current_user.is_authenticated:
             return {"error": "Требуется авторизация"}, 401
         db_sess = db_session.create_session()
-        print("====================")
-        print(serch_user_id)
         try:
-            # Получаем пользователей из БД
             current_user_db = db_sess.query(User).get(current_user.id)
             target_user = db_sess.query(User).get(serch_user_id)
 
-            # Проверка существования пользователя
             if not target_user:
                 return {'error': 'Пользователь не найден'}, 404
 
-            # Проверка на попытку добавить самого себя
             if current_user.id == target_user.id:
                 return {'error': 'Нельзя добавить самого себя'}, 400
 
-            # Обработка own_requests (исходящие заявки)
             if current_user_db.own_requests:
                 if str(serch_user_id) not in current_user_db.own_requests.split(','):
                     current_user_db.own_requests = f"{current_user_db.own_requests},{serch_user_id}"
             else:
                 current_user_db.own_requests = str(serch_user_id)
 
-            # Обработка friends_requests (входящие заявки у получателя)
             if target_user.friends_requests:
                 if str(current_user.id) not in target_user.friends_requests.split(','):
                     target_user.friends_requests = f"{target_user.friends_requests},{current_user.id}"
@@ -372,29 +337,24 @@ class RejectFriendRequestResource(Resource):
         db_sess = db_session.create_session()
 
         try:
-            # Получаем обоих пользователей из базы
             current_user_db = db_sess.query(User).get(current_user.id)
             request_user = db_sess.query(User).get(int(user_id))
 
             if not request_user:
                 return {'error': 'Пользователь не найден'}, 404
 
-            # Получаем списки запросов
             request_user_requests = request_user.own_requests.split(",") if request_user.own_requests else []
             own_friends_requests = current_user_db.friends_requests.split(
                 ",") if current_user_db.friends_requests else []
 
-            # Удаляем ID из списков запросов
             if str(current_user.id) in request_user_requests:
                 request_user_requests.remove(str(current_user.id))
             if str(request_user.id) in own_friends_requests:
                 own_friends_requests.remove(str(request_user.id))
 
-            # Обновляем поля
             request_user.own_requests = ",".join(request_user_requests) if request_user_requests else None
             current_user_db.friends_requests = ",".join(own_friends_requests) if own_friends_requests else None
 
-            # Один коммит в конце
             db_sess.commit()
             return {'status': 'success', 'message': 'Запрос в друзья отклонен'}
 
@@ -413,21 +373,18 @@ class AcceptFriendRequestResource(Resource):
         db_sess = db_session.create_session()
 
         try:
-            # Получаем обоих пользователей из базы
             current_user_db = db_sess.query(User).get(current_user.id)
             request_user = db_sess.query(User).get(int(user_id))
 
             if not request_user:
                 return {'error': 'Пользователь не найден'}, 404
 
-            # Получаем все списки
             request_user_requests = request_user.own_requests.split(",") if request_user.own_requests else []
             own_friends_requests = current_user_db.friends_requests.split(
                 ",") if current_user_db.friends_requests else []
             own_user_requests = current_user_db.own_requests.split(",") if current_user_db.own_requests else []
             request_friends_requests = request_user.friends_requests.split(",") if request_user.friends_requests else []
 
-            # Удаляем ID из всех списков запросов
             if str(current_user.id) in request_friends_requests:
                 request_friends_requests.remove(str(current_user.id))
             if str(current_user.id) in request_user_requests:
@@ -437,7 +394,6 @@ class AcceptFriendRequestResource(Resource):
             if str(request_user.id) in own_user_requests:
                 own_user_requests.remove(str(request_user.id))
 
-            # Добавляем в друзья
             requests_friends = request_user.friends_ids.split(",") if request_user.friends_ids else []
             own_friends = current_user_db.friends_ids.split(",") if current_user_db.friends_ids else []
 
@@ -446,7 +402,6 @@ class AcceptFriendRequestResource(Resource):
             if str(request_user.id) not in own_friends:
                 own_friends.append(str(request_user.id))
 
-            # Обновляем все поля
             chat = PrivateChat(
                 members=f"{request_user.id},{current_user.id}",
                 chat_name="Личный чат",
@@ -476,7 +431,6 @@ class AcceptFriendRequestResource(Resource):
             current_user_db.own_requests = ",".join(own_user_requests) if own_user_requests else None
             current_user_db.friends_requests = ",".join(own_friends_requests) if own_friends_requests else None
 
-            # Один коммит в конце
             db_sess.commit()
             return {'status': 'success', 'message': 'Запрос в друзья принят'}
 
@@ -596,11 +550,7 @@ class DeletePostResource(Resource):
         db_sess.delete(post)
         db_sess.commit()
 
-        # - из колнки comments_ids узнать id чата который относится к этому посту. ищи в Chat. Его тоже нужно удалить
-        # это я не сделал, не понял схему. muratbg, 17:31 GMT+5 19.04.2025
 
-
-# Инициализация API
 def init_api(api):
     api.add_resource(LikeResource, '/api/like')
     api.add_resource(ChatResource, '/api/chats/create', '/api/chats/edit/<int:chat_id>',

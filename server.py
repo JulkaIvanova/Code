@@ -63,7 +63,6 @@ app = f.Flask(__name__)
 socketio = SocketIO(app)
 db_session.global_init("db/Code.db")
 app.config["SECRET_KEY"] = "code_secret_key"
-# app.config["UPLOAD_FOLDER"] = os.path.join(app.root_path, "static/uploads")
 app.config["ALLOWED_EXTENSIONS"] = {"png", "jpg", "jpeg", "gif"}
 api = Api(app)
 init_api(api)
@@ -128,7 +127,6 @@ def main():
                 post_img_filenames = f"avatar_{uuid.uuid4()}_{filename}"
                 file.save(os.path.join('static\chat_avatars', post_img_filenames))
                 post_imgs_filenames.append(rf"..\static\chat_avatars\{post_img_filenames}".replace(",", '!'))
-        print("++")
         chat = Chat()
         db_sess.add(chat)
         db_sess.commit()
@@ -149,12 +147,9 @@ def main():
         return redirect(f"/id/{current_user.id}")
     posts_info = db_sess.query(Posts).all()
     filter_value = request.args.get('filter')
-    print(filter_value)
     if filter_value:
-        print("KKKKKKK")
         posts_info = custom_sorted_posts(posts_info, filter_value)
     else:
-        print("jjjjj")
         posts_info = sort_posts_by_user_likes(current_user, posts_info)
     posts = []
     for i in posts_info:
@@ -165,7 +160,6 @@ def main():
             likeBool = str(current_user.id) in i.likes_user_id.split(",") if i.likes_user_id else False
             posts.append(SupportPost(i, chat, len(commentcnt), likeBool, post_img=i.imgs.split(",") if i.imgs else None,
                                      user=user))
-    # posts.reverse()
     friend_requests = current_user.friends_requests
     friends_from_request = []
     if friend_requests:
@@ -203,7 +197,6 @@ def likes():
                 post_img_filenames = f"avatar_{uuid.uuid4()}_{filename}"
                 file.save(os.path.join('static\chat_avatars', post_img_filenames))
                 post_imgs_filenames.append(rf"..\static\chat_avatars\{post_img_filenames}".replace(",", '!'))
-        print("++")
         chat = Chat()
         db_sess.add(chat)
         db_sess.commit()
@@ -224,7 +217,6 @@ def likes():
         return redirect(f"/id/{current_user.id}")
     posts_info = db_sess.query(Posts).all()
     filter_value = request.args.get('filter')
-    print(filter_value)
     if filter_value:
         posts_info = custom_sorted_posts(posts_info, filter_value)
     else:
@@ -241,7 +233,6 @@ def likes():
                 posts.append(
                     SupportPost(i, chat, len(commentcnt), likeBool, post_img=i.imgs.split(",") if i.imgs else None,
                                 user=user))
-    # posts.reverse()
     friend_requests = current_user.friends_requests
     friends_from_request = []
     if friend_requests:
@@ -285,8 +276,6 @@ def friends():
         if current_user.private_chat_ids and user.private_chat_ids:
             cur_chat_ids = current_user.private_chat_ids.split(",")
             user_chat_ids = user.private_chat_ids.split(",")
-            print(user_chat_ids)
-            print(cur_chat_ids)
             chat = db_sess.query(PrivateChat).filter(
                 and_(
                     PrivateChat.private_chat_with_friend == True,
@@ -312,7 +301,6 @@ def login():
     if current_user.is_authenticated:
         return redirect("/main")
     form = LoginForm()
-    print(current_user)
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.email == form.email.data).first()
@@ -339,7 +327,6 @@ def id(Clientid):
     try:
         Clientid = int(Clientid)
     except Exception as err:
-        print(err)
         abort(404)
     form = SerchUserForm()
     createPostForm = CreatePostForm()
@@ -358,7 +345,6 @@ def id(Clientid):
                 post_img_filenames = f"avatar_{uuid.uuid4()}_{filename}"
                 file.save(os.path.join('static\chat_avatars', post_img_filenames))
                 post_imgs_filenames.append(rf"..\static\chat_avatars\{post_img_filenames}".replace(",", '!'))
-        print("++")
         chat = Chat()
         db_sess.add(chat)
         db_sess.commit()
@@ -379,7 +365,6 @@ def id(Clientid):
         return redirect(f"/id/{current_user.id}")
     posts_info = db_sess.query(Posts).all()
     filter_value = request.args.get('filter')
-    print(filter_value)
     if filter_value:
         posts_info = custom_sorted_posts(posts_info, filter_value)
     else:
@@ -392,7 +377,6 @@ def id(Clientid):
             likeBool = str(current_user.id) in i.likes_user_id.split(",") if i.likes_user_id else False
             posts.append(SupportPost(i, chat, len(commentcnt), likeBool, post_img=i.imgs.split(",") if i.imgs else None,
                                      user=user))
-    # posts.reverse()
     friend_requests = current_user.friends_requests
     current_friends = current_user.friends_ids
     friends = []
@@ -409,8 +393,6 @@ def id(Clientid):
     if current_user.private_chat_ids and user.private_chat_ids:
         cur_chat_ids = current_user.private_chat_ids.split(",")
         user_chat_ids = user.private_chat_ids.split(",")
-        print(user_chat_ids)
-        print(cur_chat_ids)
         chat = db_sess.query(PrivateChat).filter(
             and_(
                 PrivateChat.private_chat_with_friend == True,
@@ -451,7 +433,6 @@ def create_chat():
         return redirect(f"/id/{form.serch_user_id.data}")
     db_sess = db_session.create_session()
     friends = []
-    print(current_user.friends_ids)
     if current_user.friends_ids:
         for i in str(current_user.friends_ids).split(","):
             friends.append(db_sess.query(User).filter(User.id == int(i)).first())
@@ -474,7 +455,6 @@ def edit_chat(chat_id):
     if str(current_user.id) not in members:
         return f.abort(404)
     friends = []
-    print(current_user.friends_ids)
     if current_user.friends_ids:
         for i in str(current_user.friends_ids).split(","):
             friends.append(db_sess.query(User).filter(User.id == int(i)).first())
@@ -515,7 +495,6 @@ def private_chat(id):
     users = []
     for i in members:
         users.append(db_sess.query(User).filter(User.id == int(i)).first())
-    print(users)
     messages = []
     if private_chat.comments:
         message_id = private_chat.comments.split(",")
@@ -553,17 +532,14 @@ def handle_join_chat(data):
 
 @socketio.on('message_from_client')
 def handle_message(data):
-    print('Получено сообщение:', data)
-    # Отправляем ответ всем клиентам
     chat_id = data['chat_id']
     emit('message_from_server', {
         'text': data['text'],
         'author': current_user.name,
-        # 'time': datetime.datetime.now().strftime("%H:%M"),
         'id': current_user.id,
         'time': str(datetime.datetime.now()).split(".")[0],
         'avatar': current_user.img_avatar or '../static/img/avatar.jpg',
-        'is_mine': False  # Для других участников это "чужое" сообщение
+        'is_mine': False
     }, room=f'chat_{chat_id}')
 
 
@@ -615,7 +591,6 @@ def chats():
             chat = db_sess.query(PrivateChat).filter(PrivateChat.id == int(i)).first()
             if chat:
                 chats.append(chat)
-    print(chats)
     friend_requests = current_user.friends_requests
     friends_from_request = []
     if friend_requests:
@@ -642,7 +617,6 @@ def edit_post(post_id):
     post = db_sess.query(Posts).get(int(post_id))
     if not post or int(post.creater) != current_user.id:
         abort(404)
-    # Здесь нужно описать то как данные о посте достаются из бд
     if request.method == "GET":
         post_id = int(post_id)
         post = db_sess.query(Posts).get(post_id)
@@ -660,14 +634,12 @@ def edit_post(post_id):
     elif request.method == "POST":
         if form1.validate_on_submit():
             try:
-                # нужно внести изменения в БД (а имено изменени описание. Здесь можно редактировать только его)
                 post.caption = form1.caption.data
                 db_sess.commit()
                 return redirect("/main")
             except Exception as e:
                 print(e)
                 abort(402)
-        # здесь нужно придумать как будет обрабатывать случай если пользователь ввёл что либо не коректно
 
 
 @app.route("/settings", methods=["GET", "POST"])
@@ -704,10 +676,8 @@ def settings():
         )
     elif request.method == "POST":
         if form2.validate_on_submit():
-            print("Kkkkljggkxdfuh adruks")
             user = db_sess.query(User).get(current_user.id)
             try:
-                print(form2.age.data)
                 if int(form2.age.data) < 0:
                     return render_template(
                         "setings.html",
@@ -718,7 +688,6 @@ def settings():
                         seeFilter=False,
                         message="Возраст не может быть отрицательным!!!"
                     )
-                # Обработка файлов
                 if form2.avatar.data:
                     file = form2.avatar.data
 
@@ -788,8 +757,6 @@ def settings():
                     else:
                         path = os.path.join(*user.img_profile.split("/"))
                         path = path[3::]
-                        print(os.path.abspath(path))
-                        # path = os.path.abspath(path)
                         file.save(path)
                         avatar_filename = user.img_profile
                     user.img_profile = avatar_filename
@@ -810,7 +777,6 @@ def settings():
                     seeFilter=False,
                     message="Что-то пошло не так"
                 )
-        print("k")
         return render_template(
             "setings.html",
             form=form,
@@ -828,5 +794,4 @@ def page_not_found(e):
 
 
 if __name__ == "__main__":
-    # app.run(port=8080, host="127.0.0.1")
     socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
