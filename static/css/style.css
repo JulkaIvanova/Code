@@ -15,6 +15,23 @@ body{
 
 }
 
+.top-users-list {
+    margin-top: 10px;
+}
+
+.top-user-item {
+    transition: transform 0.2s;
+}
+
+.top-user-item:hover {
+    transform: translateX(5px);
+}
+
+.top-user-item span {
+    font-size: 0.9rem;
+    color: #e0e0e0;
+}
+
 .name{
     width: auto; height:15px;
 }

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <div style="position: relative; z-index: 10; height: 400px;" class="post-form">
-    <div class="title-create-post"><h1>Редактировать пост №{{post_id}}</h1></div>
+    <div class="title-create-post"><h1>Редактировать пост</h1></div>
     <form method="post" enctype="multipart/form-data">
 
         {{ createPostForm.hidden_tag() }}
@@ -12,7 +12,7 @@
                 <span style="color: red;">{{ error }}</span>
             {% endfor %}
         </div>
-        {{ createPostForm.submit(class="btn btn-primary submit-create") }}
+        <div style="display: flex; flex-direction: row; justify-content: center;">{{ createPostForm.submit(class="btn btn-primary submit-create") }}<div style="margin-top: 20px; margin-left: 10px;"><a style="display: inline-block; height: 38px;" class="back-create-chat" href="/main">На главную</a></div></div>
     </form>
 </div>
 {% endblock %}

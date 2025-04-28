@@ -41,8 +41,9 @@
                 <div style="margin-top: 10px;" class="alert alert-danger" role="alert">{{ message }}</div>
             {% endif %}
             <div style="border-top: 1px solid #3d3a3a; padding-top: 10px; margin-top: 30px;">
-                {{ form2.submit(class="submit") }}
+                <div style="display: flex; flex-direction: row;">{{ form2.submit(class="submit") }}<a style="color: lightgray; margin-left: 10px;" class="back-create-chat" href="/main">На главную</a></div>
             </div>
         </form>
+        
     </div>
 {% endblock %}

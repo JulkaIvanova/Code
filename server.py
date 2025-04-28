@@ -58,6 +58,22 @@ class Message:
 def allowed_file(filename, allowed_extensions={'png', 'jpg', 'jpeg', 'gif'}):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
+def get_activ(db_sess):
+    active_users = []
+    for user in db_sess.query(User).all():
+        likes_count = len(user.post_like_ids.split(",")) if user.post_like_ids else 0
+        posts_count = len(user.post_ids.split(",")) if user.post_ids else 0
+        activity_score = likes_count + 2 * posts_count
+        
+        if activity_score > 0:
+            active_users.append({
+                'user': user,
+                'score': activity_score
+            })
+
+    active_users.sort(key=lambda x: x['score'], reverse=True)
+    top_users = [item['user'] for item in active_users[:3]]
+    return top_users
 
 app = f.Flask(__name__)
 socketio = SocketIO(app)
@@ -174,6 +190,7 @@ def main():
                              cntposts=len(posts),
                              friends_from_request=friends_from_request,
                              seeFilter=True,
+                             top_users=get_activ(db_sess)
                              )
 
     return html
@@ -246,6 +263,7 @@ def likes():
                              cntposts=len(posts),
                              friends_from_request=friends_from_request,
                              seeFilter=True,
+                             top_users=get_activ(db_sess),
                              )
     return html
 
@@ -292,7 +310,8 @@ def friends():
                              ClientId=f'/id/{current_user.id}',
                              friends=user_friends,
                              friends_from_request=friends_from_request,
-                             seeFilter=False)
+                             seeFilter=False,
+                             top_users=get_activ(db_sess),)
     return html
 
 
@@ -402,7 +421,6 @@ def id(Clientid):
         ).first()
         if chat:
             chat_id = chat.id
-
     ClientId = f"/id/{current_user.id}"
     html = f.render_template(
         r"post_block.html",
@@ -419,7 +437,10 @@ def id(Clientid):
         friends_from_request=friends_from_request,
         serch_user_in_friends=str(Clientid) in friends,
         serch_user_in_friend_requests=str(Clientid) in friend_requests,
-        seeFilter=True
+        seeFilter=True,
+        top_users=get_activ(db_sess),
+        users_search=db_sess.query(User).all(),
+        UsersCnt=len(db_sess.query(User).all())
     )
     return html
 
@@ -520,7 +541,8 @@ def private_chat(id):
                              form=form,
                              ClientId=f'/id/{current_user.id}',
                              friends_from_request=friends_from_request,
-                             seeFilter=False)
+                             seeFilter=False,
+                             top_users=get_activ(db_sess))
     return html
 
 
@@ -572,7 +594,8 @@ def chat(id):
                              form=form,
                              ClientId=f'/id/{current_user.id}',
                              friends_from_request=friends_from_request,
-                             seeFilter=False)
+                             seeFilter=False,
+                             top_users=get_activ(db_sess))
     return html
 
 
@@ -601,7 +624,8 @@ def chats():
                              ClientId=f'/id/{current_user.id}',
                              chats=chats,
                              friends_from_request=friends_from_request,
-                             seeFilter=False)
+                             seeFilter=False,
+                             top_users=get_activ(db_sess))
     return html
 
 
@@ -630,7 +654,8 @@ def edit_post(post_id):
         return render_template("edit_post.html", createPostForm=form1, post_id=post_id, form=form,
                                ClientId=f'/id/{current_user.id}',
                                friends_from_request=friends_from_request,
-                               seeFilter=False)
+                               seeFilter=False,
+                               top_users=get_activ(db_sess))
     elif request.method == "POST":
         if form1.validate_on_submit():
             try:
@@ -672,7 +697,8 @@ def settings():
             ClientId=f"/id/{current_user.id}",
             form2=form2,
             friends_from_request=friends_from_request,
-            seeFilter=False
+            seeFilter=False,
+            top_users=get_activ(db_sess)
         )
     elif request.method == "POST":
         if form2.validate_on_submit():
@@ -686,7 +712,8 @@ def settings():
                         form2=form2,
                         friends_from_request=friends_from_request,
                         seeFilter=False,
-                        message="Возраст не может быть отрицательным!!!"
+                        message="Возраст не может быть отрицательным!!!",
+                        top_users=get_activ(db_sess)
                     )
                 if form2.avatar.data:
                     file = form2.avatar.data
@@ -699,7 +726,8 @@ def settings():
                             form2=form2,
                             friends_from_request=friends_from_request,
                             seeFilter=False,
-                            message="Слишком большой файл!!!"
+                            message="Слишком большой файл!!!",
+                            top_users=get_activ(db_sess)
                         )
 
                     if not allowed_file(file.filename):
@@ -710,7 +738,8 @@ def settings():
                             form2=form2,
                             friends_from_request=friends_from_request,
                             seeFilter=False,
-                            message="Недопустимый формат!!!"
+                            message="Недопустимый формат!!!",
+                            top_users=get_activ(db_sess)
                         )
 
                     if not user.img_avatar:
@@ -736,7 +765,8 @@ def settings():
                             form2=form2,
                             friends_from_request=friends_from_request,
                             seeFilter=False,
-                            message="Слишком большой файл!!!"
+                            message="Слишком большой файл!!!",
+                            top_users=get_activ(db_sess)
                         )
 
                     if not allowed_file(file.filename):
@@ -747,7 +777,8 @@ def settings():
                             form2=form2,
                             friends_from_request=friends_from_request,
                             seeFilter=False,
-                            message="Недопустимый формат!!!"
+                            message="Недопустимый формат!!!",
+                            top_users=get_activ(db_sess)
                         )
                     if not user.img_profile:
                         filename = secure_filename(file.filename)
@@ -775,7 +806,8 @@ def settings():
                     form2=form2,
                     friends_from_request=friends_from_request,
                     seeFilter=False,
-                    message="Что-то пошло не так"
+                    message="Что-то пошло не так",
+                    top_users=get_activ(db_sess)
                 )
         return render_template(
             "setings.html",
@@ -784,7 +816,8 @@ def settings():
             form2=form2,
             friends_from_request=friends_from_request,
             seeFilter=False,
-            message="Что-то пошло не так"
+            message="Что-то пошло не так",
+            top_users=get_activ(db_sess)
         )
 
 

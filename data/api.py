@@ -11,7 +11,7 @@ from werkzeug.utils import secure_filename
 import uuid
 import re
 from flask_login import current_user
-from sqlalchemy import and_
+from sqlalchemy import and_ 
 
 
 def allowed_file(filename, allowed_extensions={'png', 'jpg', 'jpeg', 'gif'}):

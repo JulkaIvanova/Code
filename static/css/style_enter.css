@@ -1,24 +1,10 @@
 body {
     background: url('../img/background.avif');
     background-size: 100vw 100vh;
-    /*max-width: 100%; */
-    /* width: 100vw;
-    height: 100vh; */
     background-repeat: no-repeat;
     background-size: cover;
 }
-/*.clearfix::after {
-    content: "";
-    display: block;
-    clear: both;
-}*/
-
 .authorization{
-    /* margin: auto; */
-    /* margin-left: auto;
-    margin-right: auto; */
-    /* margin-bottom: 50%;
-    margin-top: 50%; */
     display: block;
     box-sizing: border-box;
     width: 388px;
@@ -26,23 +12,8 @@ body {
     padding: 28px;
     background-color: #151515;
     border-radius: 20px;
-    /* grid-area: 1 / 1;
-    z-index: 1; */
     
 }
-
-/* .background-img{
-    max-width: 100%;
-    max-height: 100%;  
-    width: 100vw;
-    height: 100vw;      
-    height: auto;
-    filter: brightness(50%);
-} */
-
-/* .div-with-bacground-img{
-    grid-area: 1 / 1;
-} */
 
 a{
     text-decoration: none;
@@ -92,11 +63,6 @@ a{
 .info li{
     display: inline-block;
     direction: none;
-    
-
-    /* transform: translate(-50%); */
-    /* white-space: break-spaces; */
-    /* white-space: nowrap */
 }
 
 body{
