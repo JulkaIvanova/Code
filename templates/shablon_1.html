@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>О разработчиках</title>
+    <link rel="icon" href="../static/img/logo.png">
+    <style>
+        body {
+            background-color: #151515;
+            color: #f0f0f0;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            /* padding: 50px 0 0; */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        h1 {
+            color: #ffffff;
+            margin-bottom: 50px;
+            font-size: 2.5rem;
+        }
+        
+        .developers-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 60px;
+            max-width: 1200px;
+            padding: 0 20px;
+        }
+        
+        .developer-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 300px;
+            text-align: center;
+        }
+        
+        .developer-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #2a2a2a;
+            margin-bottom: 25px;
+            transition: transform 0.3s ease;
+        }
+        
+        .developer-image:hover {
+            transform: scale(1.05);
+        }
+        
+        .developer-name {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+        
+        .developer-role {
+            color: #b0b0b0;
+            font-size: 1rem;
+            line-height: 1.5;
+            max-width: 250px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Наша команда разработчиков</h1>
+    
+    <div class="developers-container">
+        <!-- Разработчик 1 -->
+        <div class="developer-card">
+            <img src="photo_2025-03-29_02-42-21.jpg" alt="Разработчик 1" class="developer-image">
+            <div class="developer-name">Юлия Иванова</div>
+            <div class="developer-role">
+                Full-stack разработчик с 5-летним опытом. Специализируется на веб-приложениях и API. Любит чистый код и кофе.
+            </div>
+        </div>
+        
+        <!-- Разработчик 2 -->
+        <div class="developer-card">
+            <img src="photo_2025-04-24_19-18-30.jpg" alt="Разработчик 2" class="developer-image">
+            <div class="developer-name">Богдан Муратов</div>
+            <div class="developer-role">
+                UX/UI дизайнер и фронтенд-разработчик. Создает интуитивно понятные интерфейсы с акцентом на пользовательский опыт.
+            </div>
+        </div>
+        
+        <!-- Разработчик 3 -->
+        <div class="developer-card">
+            <img src="../static/img/razrab_1.jpg" alt="Разработчик 3" class="developer-image">
+            <div class="developer-name">Андрей Русанов</div>
+            <div class="developer-role">
+                Бэкенд-разработчик и архитектор баз данных. Оптимизирует производительность и обеспечивает безопасность систем.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

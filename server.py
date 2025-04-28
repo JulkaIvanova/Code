@@ -792,6 +792,20 @@ def settings():
 def page_not_found(e):
     return render_template("404.html"), 404
 
+@app.route("/Code", methods=["GET", "POST"])
+def codes():
+    return render_template("shablon_2.html")
+
+@app.route("/rules", methods=["GET", "POST"])
+def rules():
+    return render_template("shablon_3.html")
+
+@app.route("/about", methods=["GET", "POST"])
+def razrabi():
+    return render_template("shablon_1.html")
+
+
+
 
 if __name__ == "__main__":
     socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
