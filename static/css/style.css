@@ -86,12 +86,9 @@ main{
 }
 
 .div-with-user-info{
-    /* display: grid;
-    grid-template-rows: repeat(3, 150px); */
     position: relative;
     width: 950px; height: 400px;
     background: url("../img/profile_img.jpg") no-repeat 100%;
-    /* margin-left: 130px; */
     min-width: 950px;
     border-radius: 20px;
     margin-top: 15px;
@@ -110,8 +107,6 @@ main{
 .avatar-box {
     position: absolute;
     top:-65px; left: 20px;
-    /* margin-top: -106px;
-    margin-left: 20px; */
     overflow:hidden;
     width:150px;
     height:150px;
@@ -143,20 +138,11 @@ main{
 
 .avatar-box-heder{
     position: relative;
-    /* margin-top: -106px;
-    margin-left: 20px; */
     overflow:hidden;
     width:30px;
     height:30px;
     border-radius: 50%;
 }
-/* .avatar-img{
-    margin-top: -106px;
-    margin-left: 20px;
-    border-radius: 50%;
-    border: 3px solid #302d2d;
-    height: 150px; width: auto;
-} */
 
 .UserName{
     display: inline-block;
@@ -166,8 +152,6 @@ main{
     margin-left: 180px;
     width: 500px;
     overflow: hidden;
-    /* grid-row: 330;
-    grid-column: 200; */
 }
 
 .edit-profile-button{
@@ -179,7 +163,6 @@ main{
     background-color: #5a5858;
     border-radius: 3px;
     padding: 10px 10px;
-    /* margin-left: 300px; */
 }
 .edit-profile-button:hover, .back-create-chat:hover{
     color: white;
@@ -188,7 +171,6 @@ main{
 
 .create-post-div{
     width: 950px; height: 50px;
-    /* margin-left: 130px; */
     background-color: #302d2d;
     border: 1px solid #3d3a3a;
     border-radius: 15px;
@@ -214,7 +196,6 @@ main{
 .menu{
     width: 145px;
     margin-right: 5px;
-    /* padding: 20px; */
 }
 
 .menu-li{
@@ -281,9 +262,6 @@ main{
     position: fixed;
     width: 550px;
     height: 600px;
-    /* width: 35%;
-    height: 70%; */
-    /* min-width: 300px; min-height: 565px; */
     border-radius: 20px;
     left: 0; right: 0;
     top: 0; bottom: 0;
@@ -301,7 +279,6 @@ main{
 }
 
 .input-file-with-lbl-post{
-    /* width: 100%; height: 40%; */
     margin-top: 25px;
     border: 3px dashed #3d3a3a;
     padding: 25px;
@@ -321,10 +298,9 @@ main{
     background-color: #302d2d;
     border: none;
     outline: none;
-    color: white; /* Цвет текста */
+    color: white; 
 
     &:focus {
-        /* Убираем все визуальные эффекты при фокусе */
         background-color: #302d2d;
         border: none;
         outline: none;
@@ -342,10 +318,6 @@ main{
 .caption-post-input:focus{
     color: white;
 }
-/* 
-.caption-post-input[placeholder]{
-    color: white;
-} */
 
 .input-caption-with-lbl{
     margin-top: 30px;
@@ -385,7 +357,6 @@ main{
     display: inline;
     text-align: center;
     background-color: #3d3a3a;
-    /* width: 100px;height: 100px; */
     height: 500px;
     border: 1px solid #3d3a3a;
     border-radius: 15px;
@@ -523,7 +494,6 @@ header{
 
 .search-friends-div{
     width: 950px;
-    /* margin-left: 130px; */
     background-color: #302d2d;
     border: 1px solid #3d3a3a;
     border-radius: 15px;
@@ -537,7 +507,6 @@ header{
 
 .friends-div{
     width: 950px;
-    /* margin-left: 130px; */
     background-color: #302d2d;
     border: 1px solid #3d3a3a;
     border-radius: 15px;
@@ -588,7 +557,6 @@ header{
 }
 
 .button-act-with-friend{
-    /* position: relative; */
     display: inline-block;
     color: white;
     background-color: #3d3a3a;
@@ -651,7 +619,6 @@ header{
     width: 500px; max-height: 400px;
     overflow-y: auto;
     overflow-x: hidden;
-    /* margin-left: 130px; */
     background-color: #201f1f;
     border: 1px solid #3d3a3a;
     border-radius: 15px;
@@ -824,7 +791,6 @@ header{
 }
 
 .friends-list {
-    /* position: relative; */
     max-height: 500px;
     overflow: auto;
     width: 60%;
@@ -841,9 +807,6 @@ header{
     transition: background-color 0.3s;
 }
 
-/* .friend-item:first-child{
-    margin-top: 50px;
-} */
 
 .friend-item:hover {
     background-color: #302d2d;
@@ -990,26 +953,6 @@ header{
     
 }
 
-
-/* .chat-avatar-preview{
-    position: absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    width:150px;
-    height:150px;
-    object-fit:cover;
-} */
-
-/* .custom-file-upload {
-    display: inline-block;
-    padding: 6px 12px;
-    cursor: pointer;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: #f8f8f8;
-    margin-bottom: 10px; 
-} */
 
 
 
@@ -1193,13 +1136,11 @@ border-radius: 5px;
 cursor: pointer;
 margin-left: 10px;
 }
-/* Стили для скролла сообщений */
 .messages-list {
     scrollbar-width: thin;
     scrollbar-color: #555 #222;
   }
   
-  /* Стили для трекбара скролла */
   .messages-list::-webkit-scrollbar {
     width: 8px;
   }
@@ -1213,7 +1154,6 @@ margin-left: 10px;
     background-color: #222;
   }
   
-  /* Анимация появления сообщений */
   .message-enter-active {
     animation: slideIn 0.3s ease-out forwards;
   }
@@ -1222,4 +1162,28 @@ margin-left: 10px;
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
   }
-     
+
+
+
+.serch-form > div {
+padding: 5px;
+display: flex;
+flex-direction: column;
+justify-content: center;
+border-radius: 5px;
+box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.serch-form > div::-webkit-scrollbar {
+width: 6px;
+}
+
+.serch-form > div::-webkit-scrollbar-thumb {
+background-color: #555;
+border-radius: 3px;
+}
+
+.search-user-item{
+    padding: 3px;
+}
+    

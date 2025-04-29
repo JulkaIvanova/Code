@@ -11,7 +11,7 @@ from werkzeug.utils import secure_filename
 import uuid
 import re
 from flask_login import current_user
-from sqlalchemy import and_ 
+from sqlalchemy import and_, func, or_ 
 
 
 def allowed_file(filename, allowed_extensions={'png', 'jpg', 'jpeg', 'gif'}):
@@ -550,8 +550,24 @@ class DeletePostResource(Resource):
         db_sess.delete(post)
         db_sess.commit()
 
-
+class GetAllUsers(Resource):
+    def get(self):
+        query = request.args.get('q', '').lower()
+        db_sess = db_session.create_session()
+        users = []
+        for i in db_sess.query(User).all():
+            query = query.lower().strip()
+            if query.replace(" ", "") in str(i.name.lower()) + str(i.surname.lower()):
+                users.append(i)
+        return jsonify([{
+            'id': user.id,
+            'name': user.name,
+            'surname': user.surname,
+            'img_avatar': user.img_avatar or '../static/img/avatar.jpg'  
+        } for user in users])
+        
 def init_api(api):
+    api.add_resource(GetAllUsers, '/api/search_users')
     api.add_resource(LikeResource, '/api/like')
     api.add_resource(ChatResource, '/api/chats/create', '/api/chats/edit/<int:chat_id>',
                      "/delete_private_chat/<chat_id>")

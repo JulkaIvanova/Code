@@ -28,106 +28,83 @@
                     <i class="bi bi-search serch-img"></i><!-- 
                     -->{{ form.serch_user_id(id="serch", class="serch", style="padding: 0px;", placeholder="Поиск") }}
                     <div style="background-color: #201f1f; max-height: 300px; width: 185px; position: absolute; left: 20px; overflow: auto; scrollbar-width: thin;">
-                        <div class="top-users-list search_users_list" style="margin-left: 15px;">
-                            {% for user in users_search %}
-                                <div class="top-user-item search_user" style="margin-bottom: 10px;">
-                                    <a href="/id/{{ user.id }}" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
-                                        <img src="{{ user.img_avatar or '../static/img/avatar.jpg' }}" 
-                                             style="width: 30px; height: 30px; border-radius: 50%; margin-right: 8px; object-fit: cover;">
-                                        <span style="color: white;">{{ user.name }} {{ user.surname }}</span>
-                                    </a>
-                                </div>
-                            {% endfor %}
-                        </div>
+                        
                     </div>
                 </form>
-                <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        const searchInput = document.getElementById('serch');
-                        const searchResults = document.querySelector('.serch-form > div');
-                        const searchForm = document.querySelector('.serch-form');
-                        
-                        // Изначально скрываем панель
-                        searchResults.style.display = 'none';
-                        
-                        // Показываем панель при фокусе на поле ввода
-                        searchInput.addEventListener('focus', function() {
-                            searchResults.style.display = 'block';
-                            // Показываем стандартное содержимое при первом открытии
-                            if (this.value.trim() === '') {
-                                showDefaultContent();
-                            }
-                        });
-                        
-                        // Функция для отображения стандартного содержимого
-                        function showDefaultContent() {
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const searchInput = document.getElementById('serch');
+                            const searchResults = document.querySelector('.serch-form > div');
+                            const searchForm = document.querySelector('.serch-form');
+                    
                             searchResults.innerHTML = '<p style="color: #999; text-align: center; margin-top: 10px;">Ничего не найдено</p>';
-                        }
-                        
-                        // Скрываем панель при клике вне формы
-                        document.addEventListener('click', function(e) {
-                            if (!searchForm.contains(e.target)) {
-                                searchResults.style.display = 'none';
-                            }
-                        });
-                        
-                        // Обработка ввода текста
-                        searchInput.addEventListener('input', function() {
-                            const query = this.value.trim().toLowerCase();
+                            searchResults.style.display = 'none';
                             
-                            if (query.length === 0) {
-                                showDefaultContent();
-                                return;
-                            }
-                            
-                            // Получаем всех пользователей из DOM
-                            const allUserElements = document.querySelectorAll('.search_user');
-                            const filteredUsers = Array.from(allUserElements).filter(item => {
-                                const nameSpan = item.querySelector('span');
-                                const fullName = nameSpan.textContent.toLowerCase();
-                                return fullName.includes(query);
+                            searchInput.addEventListener('focus', function() {
+                                searchResults.style.display = 'block';
                             });
-                            console.log(filteredUsers)
-                            if (filteredUsers.length === 0) {
-                                searchResults.innerHTML = '<p style="color: #999; text-align: center; margin-top: 10px;">Ничего не найдено</p>';
-                            } else {
-                                const usersContainer = document.createElement('div');
-                                usersContainer.className = 'search_users_list';
-                                usersContainer.style.marginLeft = '15px';
-                                
-                                filteredUsers.forEach(user => {
-                                    usersContainer.appendChild(user.cloneNode(true));
-                                });
-                                
-                                searchResults.innerHTML = '';
-                                searchResults.appendChild(usersContainer);
-                            }
-                        });
-                        
-                        // Предотвращаем закрытие панели при клике на неё
-                        searchResults.addEventListener('click', function(e) {
-                            e.stopPropagation();
-                        });
-                        
-                        // Обработка отправки формы
-                        searchForm.addEventListener('submit', function(e) {
-                            e.preventDefault();
                             
-                            const firstUserLink = searchResults.querySelector('a');
-                            if (firstUserLink) {
-                                const userId = firstUserLink.getAttribute('href').split('/id/')[1];
-                                searchInput.value = userId;
-                            }
+                            document.addEventListener('click', function(e) {
+                                if (!searchForm.contains(e.target)) {
+                                    searchResults.style.display = 'none';
+                                }
+                            });
                             
-                            this.submit();
+                            searchInput.addEventListener('input', async function() {
+                                const query = this.value.trim();
+                                
+                                if (query.length === 0) {
+                                    searchResults.innerHTML = '<p style="color: #999; text-align: center; margin-top: 10px;">Ничего не найдено</p>';
+                                    return;
+                                }
+                                
+                                try {
+                                    const response = await fetch(`/api/search_users?q=${encodeURIComponent(query)}`);
+                                    const users = await response.json();
+                                    
+                                    if (users.length === 0) {
+                                        searchResults.innerHTML = '<p style="color: #999; text-align: center; margin-top: 10px;">Ничего не найдено</p>';
+                                    } else {
+                                        let html = '';
+                                        users.forEach(user => {
+                                            html += `
+                                            <div class="top-user-item search-user-item" style="margin-bottom: 10px;">
+                                                <a href="/id/${user.id}" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
+                                                    <img src="${user.img_avatar || '../static/img/avatar.jpg'}" 
+                                                         style="width: 30px; height: 30px; border-radius: 50%; margin-right: 8px; object-fit: cover;">
+                                                    <span style="color: white;">${user.name} ${user.surname}</span>
+                                                </a>
+                                            </div>`;
+                                        });
+                                        searchResults.innerHTML = html;
+                                    }
+                                } catch (error) {
+                                    console.error('Ошибка поиска:', error);
+                                    searchResults.innerHTML = '<p style="color: #ff6b6b; text-align: center; margin-top: 10px;">Ошибка загрузки</p>';
+                                }
+                            });
+                            
+                            searchResults.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                            });
+                            
+                            searchForm.addEventListener('submit', function(e) {
+                                e.preventDefault();
+                                
+                                const firstUserLink = searchResults.querySelector('a');
+                                if (firstUserLink) {
+                                    const userId = firstUserLink.getAttribute('href').split('/id/')[1];
+                                    searchInput.value = userId;
+                                }
+                                
+                                this.submit();
+                            });
+                            
+                            window.addEventListener('beforeunload', function() {
+                                searchInput.value = '';
+                            });
                         });
-                        
-                        // Очищаем поле при обновлении страницы
-                        window.addEventListener('beforeunload', function() {
-                            searchInput.value = '';
-                        });
-                    });
-                    </script>
+                        </script>
                 <div style="display: inline-block; position: relative;">
                     {% if  friends_from_request %}
                         <img style="position: absolute; top:3px; left: 14px; width: 8px;" src="../static/img/notice.png">
