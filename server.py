@@ -698,7 +698,8 @@ def settings():
             form2=form2,
             friends_from_request=friends_from_request,
             seeFilter=False,
-            top_users=get_activ(db_sess)
+            top_users=get_activ(db_sess),
+            user=current_user
         )
     elif request.method == "POST":
         if form2.validate_on_submit():
@@ -713,7 +714,8 @@ def settings():
                         friends_from_request=friends_from_request,
                         seeFilter=False,
                         message="Возраст не может быть отрицательным!!!",
-                        top_users=get_activ(db_sess)
+                        top_users=get_activ(db_sess),
+                        user=current_user
                     )
                 if form2.avatar.data:
                     file = form2.avatar.data
@@ -727,7 +729,8 @@ def settings():
                             friends_from_request=friends_from_request,
                             seeFilter=False,
                             message="Слишком большой файл!!!",
-                            top_users=get_activ(db_sess)
+                            top_users=get_activ(db_sess),
+                            user=current_user
                         )
 
                     if not allowed_file(file.filename):
@@ -739,7 +742,8 @@ def settings():
                             friends_from_request=friends_from_request,
                             seeFilter=False,
                             message="Недопустимый формат!!!",
-                            top_users=get_activ(db_sess)
+                            top_users=get_activ(db_sess),
+                            user=current_user
                         )
 
                     if not user.img_avatar:
@@ -766,7 +770,8 @@ def settings():
                             friends_from_request=friends_from_request,
                             seeFilter=False,
                             message="Слишком большой файл!!!",
-                            top_users=get_activ(db_sess)
+                            top_users=get_activ(db_sess),
+                            user=current_user
                         )
 
                     if not allowed_file(file.filename):
@@ -778,7 +783,8 @@ def settings():
                             friends_from_request=friends_from_request,
                             seeFilter=False,
                             message="Недопустимый формат!!!",
-                            top_users=get_activ(db_sess)
+                            top_users=get_activ(db_sess),
+                            user=current_user
                         )
                     if not user.img_profile:
                         filename = secure_filename(file.filename)
@@ -807,7 +813,8 @@ def settings():
                     friends_from_request=friends_from_request,
                     seeFilter=False,
                     message="Что-то пошло не так",
-                    top_users=get_activ(db_sess)
+                    top_users=get_activ(db_sess),
+                    user=current_user
                 )
         return render_template(
             "setings.html",
@@ -817,7 +824,8 @@ def settings():
             friends_from_request=friends_from_request,
             seeFilter=False,
             message="Что-то пошло не так",
-            top_users=get_activ(db_sess)
+            top_users=get_activ(db_sess),
+            user=current_user
         )
 
 

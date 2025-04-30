@@ -25,18 +25,60 @@
                     </div>
                 </div>
                 
-                <div class="grop-inputs-file">
+                <div style="display: flex; flex-direction: row; justify-content: space-between; padding: 10px;" class="grop-inputs-file">
                     <div class="input-file-with-lbl">
-                        {{ form2.avatar.label(class="edit-label-text") }}
-                        {{ form2.avatar(class="file-input") }}
+                        <label style="display: flex; flex-direction: column; align-items: center; justify-content: center;" for="avatar" >
+                            <p style="color: white; margin-bottom: 20px;">Выбирите аватарку</p>
+                            <div style="position: relative; top:0; left: 0; width: 100px; height: 100px; border-color: #3d3a3a;" class="avatar-box">
+                                <img id="avatar-preview" class="avatar-img" style="width: 100px; height: 100px;" src="{{ user.img_avatar or '../static/img/avatar.jpg' }}">
+                            </div>
+                            
+                        </label>
+                        {{ form2.avatar(class="file-input", hidden=true, id="avatar") }}
                     </div>
-                    
+
                     <div class="input-file-with-lbl">
-                        {{ form2.background.label(class="edit-label-text") }}
-                        {{ form2.background(class="file-input") }}
+                        <label style="display: flex; flex-direction: column; align-items: center; justify-content: center;" for="background" >
+                            <p style="color: white; margin-bottom: 20px;">Выбирите фон профиля</p>
+                            <div style="position: relative; top:0; left: 0; width: 238px; height: 100px; border-color: #3d3a3a; border-radius: 5px;" class="avatar-box">
+                                <img id="background-preview" class="avatar-img" style="width: 238px; height: 100px;" src="{{ user.img_profile or '../static/img/profile_img.jpg' }}">
+                            </div>
+                            
+                        </label>
+                        {{ form2.background(class="file-input", hidden=true, id="background") }}
                     </div>
                 </div>
             </div>
+            <script>
+                const AvatarInput = document.querySelector('#avatar');
+                const AvatarPreview = document.querySelector('#avatar-preview');
+                AvatarInput.addEventListener('change', function(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(e) {
+                            AvatarPreview.src = e.target.result;
+                        };
+                        
+                        reader.readAsDataURL(file);
+                    }
+                });
+                const BackgroundInput = document.querySelector('#background');
+                const BackgroundPreview = document.querySelector('#background-preview');
+                BackgroundInput.addEventListener('change', function(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(e) {
+                            BackgroundPreview.src = e.target.result;
+                        };
+                        
+                        reader.readAsDataURL(file);
+                    }
+                });
+            </script>
             {% if message %}
                 <div style="margin-top: 10px;" class="alert alert-danger" role="alert">{{ message }}</div>
             {% endif %}
