@@ -3,12 +3,11 @@
                 <div class="create-post-div"><p id="createPost" class="create-post-button"><i style="margin-right: 10px;" class="bi bi-plus-lg"></i><span style="line-height: 50px;">Создать пост</span></p></div>
                 <div id="contaner">
                     <div id="wrapper" class="bacground-wrapper"></div>
-                    <div class="post-form">
+                    <div style="overflow: auto; scrollbar-width: thin;" class="post-form">
                         <div class="title-create-post"><h1>Создать пост</h1></div>
                         <form method="post" enctype="multipart/form-data">
 
                             {{ createPostForm.hidden_tag() }}
-                            <p>{{ClientId}}</p>
                             <div class="input-file-with-lbl-post">
                                 <i style="font-size: 60px; margin-bottom: 30px;" class="bi bi-upload"></i>
                                 <br>
@@ -34,7 +33,33 @@
                                     <span style="color: red;">{{ error }}</span>
                                 {% endfor %}
                             </div>
+                            <div style="width: 100%; text-align: left; margin-top: 10px;">
+                                <input style="margin-right: 10px;" type="checkbox" id="isCode">
+                                <label for="isCode">Использовать интерпретатор Python</label>
+                            </div>
+                            {{ createPostForm.code(class="code-input form-control", id="code-input", rows="8", placeholder="Напишите код") }}
                             {{ createPostForm.submit(class="btn btn-primary submit-create") }}
+                            <script>
+                                const checkbox = document.getElementById('isCode');
+                                checkbox.onclick = function (){
+                                    const isChecked = checkbox.checked;
+                                    const codeInput = document.getElementById("code-input")
+                                    if (isChecked) {
+                                        codeInput.hidden = false;
+                                    } else {
+                                        codeInput.hidden = true;
+                                    }
+                                }
+                                window.addEventListener("load", function(){
+                                    const isChecked = checkbox.checked;
+                                    const codeInput = document.getElementById("code-input")
+                                    if (isChecked) {
+                                        codeInput.hidden = false;
+                                    } else {
+                                        codeInput.hidden = true;
+                                    }
+                                })
+                            </script>
                         </form>
                     </div>
                 </div>

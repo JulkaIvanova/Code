@@ -35,6 +35,103 @@
     <div class="caption">
         <p><p>{{posts[i].post.caption}}</p></p>
     </div>
+    {% if posts[i].post.isWithPyCode %}
+    <div class="block-with-code">
+        <textarea class="code" id="code" readonly>{{posts[i].post.code}}</textarea>
+        <button class="button-code run" id="run">Выполнить</button>
+        <div class="output" id="output"></div>
+        <script>
+            if (typeof window.createWorker === 'undefined') {
+                window.createWorker = () => {
+                    const workerScript = `
+                        self.importScripts('https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js');
+                        
+                        async function initialize() {
+                            self.pyodide = await loadPyodide({
+                                indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.23.4/full/'
+                            });
+                            
+                            self.pyodide.setStdout({
+                                batched: (text) => {
+                                    self.postMessage({ type: 'output', text: text });
+                                }
+                            });
+                            
+                            self.postMessage({ type: 'ready' });
+                        }
+                        
+                        self.onmessage = async (e) => {
+                            try {
+                                await self.pyodide.runPythonAsync(e.data.code);
+                                self.postMessage({ type: 'done' });
+                            } catch (err) {
+                                self.postMessage({ type: 'error', text: err.message });
+                            }
+                        };
+                        
+                        initialize();
+                    `;
+        
+                    const blob = new Blob([workerScript], { type: 'application/javascript' });
+                    return new Worker(URL.createObjectURL(blob));
+                };
+            }
+        
+            document.querySelectorAll('.block-with-code').forEach(block => {
+                if (block.dataset.initialized) return;
+                
+                const codeElement = block.querySelector('.code');
+                const runButton = block.querySelector('.run');
+                const outputElement = block.querySelector('.output');
+                
+                let worker = null;
+                let isReady = false;
+                let timeoutId = null;
+                
+                const initWorker = () => {
+                    worker = window.createWorker();
+                    isReady = false;
+                    runButton.disabled = true;
+                    
+                    worker.onmessage = (e) => {
+                        if (e.data.type === 'output') {
+                            outputElement.textContent += e.data.text;
+                        } else if (e.data.type === 'error') {
+                            outputElement.innerHTML = `<span class="error">${e.data.text}</span>`;
+                            runButton.disabled = false;
+                            clearTimeout(timeoutId); 
+                        } else if (e.data.type === 'ready') {
+                            runButton.disabled = false;
+                            isReady = true;
+                        } else if (e.data.type === 'done') {
+                            runButton.disabled = false;
+                            clearTimeout(timeoutId); 
+                        }
+                    };
+                };
+                
+                initWorker();
+                block.dataset.initialized = 'true';
+                
+                runButton.addEventListener('click', () => {
+                    if (!isReady) return;
+                    
+                    const code = codeElement.value;
+                    outputElement.textContent = "";
+                    runButton.disabled = true;
+                    
+                    timeoutId = setTimeout(() => {
+                        worker.terminate();
+                        outputElement.textContent += "\n\n[Прервано по таймауту (5 сек)]";
+                        initWorker();
+                    }, 5000);
+        
+                    worker.postMessage({ code });
+                });
+            });
+        </script>
+    </div>
+    {% endif %}
     <div style="display: flex; flex-direction: row; justify-content: space-between;">
         <div class="likes-and-comments">
             <div {% if posts[i].likeBool %} data-bool='1' {% else %} data-bool='0' {% endif%} id={{i}} class="likes"><i {% if posts[i].likeBool %} class="bi bi-heart-fill" {% else %} class="bi bi-heart" {% endif%}></i><span style="padding-left: 10px; width: 80%;">{{posts[i].post.likes}}</span></div>

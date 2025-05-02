@@ -34,4 +34,5 @@ class CreatePostForm(FlaskForm):
         ('mems', '#Мемы'),
         ('ideas', '#Идеи')
     ], default='all')
+    code = TextAreaField()
     submit = SubmitField('Готово')

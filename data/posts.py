@@ -20,5 +20,7 @@ class Posts(SqlAlchemyBase, SerializerMixin):
     creater = sqlalchemy.Column(
         sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id")
     )
+    isWithPyCode = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
+    code = sqlalchemy.Column(sqlalchemy.String)
     likes_user_id = sqlalchemy.Column(sqlalchemy.String)
     user = orm.relationship("User")

@@ -154,6 +154,8 @@ def main():
             comments_ids=chat.id,
             creater=current_user.id,
             likes=0,
+            isWithPyCode = bool(createPostForm.code.data),
+            code = createPostForm.code.data if createPostForm.code.data else "",
         )
         db_sess.add(post)
         db_sess.commit()
@@ -225,6 +227,8 @@ def likes():
             comments_ids=chat.id,
             creater=current_user.id,
             likes=0,
+            isWithPyCode = bool(createPostForm.code.data),
+            code = createPostForm.code.data if createPostForm.code.data else "",
         )
         db_sess.add(post)
         db_sess.commit()
@@ -264,6 +268,7 @@ def likes():
                              friends_from_request=friends_from_request,
                              seeFilter=True,
                              top_users=get_activ(db_sess),
+                             
                              )
     return html
 
@@ -367,7 +372,6 @@ def id(Clientid):
         chat = Chat()
         db_sess.add(chat)
         db_sess.commit()
-
         post = Posts(
             caption=createPostForm.caption.data,
             imgs=",".join(post_imgs_filenames),
@@ -375,6 +379,8 @@ def id(Clientid):
             comments_ids=chat.id,
             creater=current_user.id,
             likes=0,
+            isWithPyCode = bool(createPostForm.code.data),
+            code = createPostForm.code.data if createPostForm.code.data else "",
         )
         db_sess.add(post)
         db_sess.commit()
