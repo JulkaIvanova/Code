@@ -124,7 +124,7 @@
 
         function set_contaner_3(e){
             e.preventDefault();
-            if (isNaN(+age.value) | age.value < 0){
+            if (isNaN(+age.value) | +age.value <= 0 | !Number.isInteger(+age.value)){
                 age.style.border = 'solid red 1px'
                 setTimeout(function(){
                     age.style.border = 'none'
