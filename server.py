@@ -28,6 +28,7 @@ from data.api import *
 from flask_restful import Api
 from data.custom_recommendations_new import *
 from data.custom_sorted_posts_new import *
+import random
 
 
 class SupportPost:
@@ -58,13 +59,14 @@ class Message:
 def allowed_file(filename, allowed_extensions={'png', 'jpg', 'jpeg', 'gif'}):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
+
 def get_activ(db_sess):
     active_users = []
     for user in db_sess.query(User).all():
         likes_count = len(user.post_like_ids.split(",")) if user.post_like_ids else 0
         posts_count = len(user.post_ids.split(",")) if user.post_ids else 0
         activity_score = likes_count + 2 * posts_count
-        
+
         if activity_score > 0:
             active_users.append({
                 'user': user,
@@ -74,6 +76,7 @@ def get_activ(db_sess):
     active_users.sort(key=lambda x: x['score'], reverse=True)
     top_users = [item['user'] for item in active_users[:3]]
     return top_users
+
 
 app = f.Flask(__name__)
 socketio = SocketIO(app)
@@ -154,8 +157,8 @@ def main():
             comments_ids=chat.id,
             creater=current_user.id,
             likes=0,
-            isWithPyCode = bool(createPostForm.code.data),
-            code = createPostForm.code.data if createPostForm.code.data else "",
+            isWithPyCode=bool(createPostForm.code.data),
+            code=createPostForm.code.data if createPostForm.code.data else "",
         )
         db_sess.add(post)
         db_sess.commit()
@@ -227,8 +230,8 @@ def likes():
             comments_ids=chat.id,
             creater=current_user.id,
             likes=0,
-            isWithPyCode = bool(createPostForm.code.data),
-            code = createPostForm.code.data if createPostForm.code.data else "",
+            isWithPyCode=bool(createPostForm.code.data),
+            code=createPostForm.code.data if createPostForm.code.data else "",
         )
         db_sess.add(post)
         db_sess.commit()
@@ -268,7 +271,7 @@ def likes():
                              friends_from_request=friends_from_request,
                              seeFilter=True,
                              top_users=get_activ(db_sess),
-                             
+
                              )
     return html
 
@@ -316,7 +319,7 @@ def friends():
                              friends=user_friends,
                              friends_from_request=friends_from_request,
                              seeFilter=False,
-                             top_users=get_activ(db_sess),)
+                             top_users=get_activ(db_sess), )
     return html
 
 
@@ -334,7 +337,14 @@ def login():
         return render_template(
             "logo_form.html", message="Неправильный логин или пароль", form=form
         )
-    return render_template("logo_form.html", form=form)
+    words = ['Попались! Не беспокойтесь, мы шутим)', 'Налейте чаю и расслабьтесь всё хорошо :)',
+             'Посмотрите вокруг, жизнь прекрасна!', 'На данный момент здесь ничего нет.',
+             'Спасибо за то, что вы с нами!', 'Мы по Вам скучаем, нажимайте сюда почаще.',
+             'Поздравляем! Вы крайне внимательны и нашли кнопку.',
+             'Наш программист настоял на этой кнопке. \nНадеюсь, она Вам понравится)',
+             'Ваш интернет прекрасно работает! \nСпасибо, чьл Вы с нами!', 'Вы удивитесь, но это не просто кнопка)',
+             'Ну самое важное! Вы самый лучший пользователь!']
+    return render_template("logo_form.html", form=form, word=random.choice(words))
 
 
 @app.route('/logout')
@@ -379,8 +389,8 @@ def id(Clientid):
             comments_ids=chat.id,
             creater=current_user.id,
             likes=0,
-            isWithPyCode = bool(createPostForm.code.data),
-            code = createPostForm.code.data if createPostForm.code.data else "",
+            isWithPyCode=bool(createPostForm.code.data),
+            code=createPostForm.code.data if createPostForm.code.data else "",
         )
         db_sess.add(post)
         db_sess.commit()
@@ -839,19 +849,20 @@ def settings():
 def page_not_found(e):
     return render_template("404.html"), 404
 
+
 @app.route("/Code", methods=["GET", "POST"])
 def codes():
     return render_template("shablon_2.html")
+
 
 @app.route("/rules", methods=["GET", "POST"])
 def rules():
     return render_template("shablon_3.html")
 
+
 @app.route("/about", methods=["GET", "POST"])
 def razrabi():
     return render_template("shablon_1.html")
-
-
 
 
 if __name__ == "__main__":
