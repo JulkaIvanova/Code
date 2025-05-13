@@ -26,13 +26,23 @@
                     let buttons = document.querySelectorAll('#del-friend')
                     for (let i=0; i < buttons.length; i++){
                         buttons[i].addEventListener('click', async (e) => {
+                        const isConfirmed = confirm('Вы точно хотите удалить этого друга?');
+                        if (!isConfirmed) {
+                            return;
+                        }
                         try {
                             const friend_id = e.currentTarget.dataset.friend_id
                             const response = await fetch(`/delete_friend/${friend_id}`, { 
                             method: 'DELETE',
                             });
+                            if (response.ok) {
+                                location.reload(); 
+                            } else {
+                                alert('Ошибка при удалении друга');
+                            }
                         } catch (error) {
                             console.error('Ошибка:', error);
+                            alert('Произошла ошибка при удалении');
                         }
                         location.reload()
                         });

@@ -148,21 +148,29 @@
             </div>
         </div>
     {% endfor %}
-    <script>
-        let buttonsDel = document.querySelectorAll('#del-post-link')
-        for (let i=0; i < buttonsDel.length; i++){
-            buttonsDel[i].addEventListener('click', async (e) => {
+<script>
+    let buttonsDel = document.querySelectorAll('#del-post-link');
+    for (let i = 0; i < buttonsDel.length; i++) {
+        buttonsDel[i].addEventListener('click', async (e) => {
+            const isConfirmed = confirm('Вы точно хотите удалить этот пост?');
+            if (!isConfirmed) {
+                return;
+            }
             try {
-                const del_id = e.currentTarget.dataset.del_id
+                const del_id = e.currentTarget.dataset.del_id;
                 const response = await fetch(`/del_post/${del_id}`, { 
-                method: 'DELETE',
+                    method: 'DELETE',
                 });
+                if (response.ok) {
+                    location.reload(); 
+                } else {
+                    alert('Ошибка при удалении поста');
+                }
             } catch (error) {
                 console.error('Ошибка:', error);
+                alert('Произошла ошибка при удалении');
             }
-            location.reload()
-            });
-        }
-        
-    </script>
+        });
+    }
+</script>
 {% endblock %}

@@ -36,13 +36,23 @@
                     let buttons = document.querySelectorAll('#del-link')
                     for (let i=0; i < buttons.length; i++){
                         buttons[i].addEventListener('click', async (e) => {
+                        const isConfirmed = confirm('Вы точно хотите удалить этот чат?');
+                        if (!isConfirmed) {
+                            return;
+                        }
                         try {
                             const chat_id = e.currentTarget.dataset.chat_id
                             const response = await fetch(`/delete_private_chat/${chat_id}`, { 
                             method: 'DELETE',
                             });
+                            if (response.ok) {
+                                location.reload(); 
+                            } else {
+                                alert('Ошибка при удалении чата');
+                            }
                         } catch (error) {
                             console.error('Ошибка:', error);
+                            alert('Произошла ошибка при удалении');
                         }
                         location.reload()
                         });
