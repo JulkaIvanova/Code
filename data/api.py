@@ -205,11 +205,28 @@ class ChatResource(Resource):
 
             chat_name = request.form.get('chatName')
             friends = request.form.get('friends')
-
+            members = f"{extract_numbers(friends)},{current_user.id}"
+            members = members.split(",")
+            old_members = chat.members.split(",") if chat.members else []
+            if set(old_members) != set(members):
+                if len(old_members) > len(members):
+                    delete_members = list(set(old_members) - set(members))
+                    for i in delete_members:
+                        user = db_sess.query(User).get(int(i))
+                        if user.private_chat_ids:
+                            chats = user.private_chat_ids.split(",")
+                            chats.remove(str(chat_id))
+                            user.private_chat_ids = ",".join(chats)
+                elif len(members) > len(old_members):
+                    add_friends = list(set(members) - set(old_members))
+                    for i in add_friends:
+                        user = db_sess.query(User).get(int(i))
+                        user.private_chat_ids = f"{user.private_chat_ids},{chat_id}" if user.private_chat_ids else str(chat_id)
+                        
             if chat_name:
                 chat.chat_name = chat_name
             if friends:
-                chat.members = f"{extract_numbers(friends)},{current_user.id}"
+                chat.members = ",".join(members)
             if avatar_filename:
                 chat.chat_avatar = avatar_filename
 
@@ -231,14 +248,26 @@ class ChatResource(Resource):
             members = chat.members.split(",")
             if str(current_user.id) not in members:
                 return {'status': 'error', 'message': 'Чат не найден'}, 404
-            session.delete(chat)
-            session.commit()
-            for i in members:
-                user = session.query(User).get(int(i))
-                if user.private_chat_ids:
-                    chats = user.private_chat_ids.split(",")
-                    chats.remove(str(chat_id))
-                    user.private_chat_ids = ",".join(chats)
+            if members:
+                members.remove(str(current_user.id))
+            if len(members) < 2:
+                session.delete(chat)
+                session.commit()
+                members.append(str(current_user.id))
+                for i in members:
+                    user = session.query(User).get(int(i))
+                    if user.private_chat_ids:
+                        chats = user.private_chat_ids.split(",")
+                        chats.remove(str(chat_id))
+                        user.private_chat_ids = ",".join(chats)
+                session.commit()
+                return jsonify({'status': 'success'})
+            user = session.query(User).get(int(current_user.id))
+            if user.private_chat_ids:
+                chats = user.private_chat_ids.split(",")
+                chats.remove(str(chat_id))
+                user.private_chat_ids = ",".join(chats)
+            chat.members = ",".join(members)
             session.commit()
             return jsonify({'status': 'success'})
         except Exception as e:
